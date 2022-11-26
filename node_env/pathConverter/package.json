@@ -1,0 +1,17 @@
+{
+  "name": "path_converter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "run": "npx electron ."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^10.4.7"
+  },
+  "dependencies": {
+    "three": "^0.146.0"
+  }
+}

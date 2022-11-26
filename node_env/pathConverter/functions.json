@@ -1,0 +1,11 @@
+{
+    "turn": "turn($angle, $velocity, 3, imu)",
+    "drive": {
+        "forward": "driveCM($distance, $velocity, DriveTrain.Direction.FORWARD)",
+        "backward": "driveCM($distance, $velocity, DriveTrain.Direction.BACKWARD)"
+    },
+    "strafe": {
+        "left": "strafeCM($distance, $velocity, DriveTrain.Direction.LEFT)",
+        "right": "strafeCM($distance, $velocity, DriveTrain.Direction.RIGHT)"
+    }
+}

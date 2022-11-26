@@ -1,0 +1,37 @@
+{
+    "field": {
+        "width": 366,
+        "height": 366
+    },
+    "path": [
+        {
+            "x": 26.930851063829785,
+            "y": 344.5851063829787
+        },
+        {
+            "x": 26.93085106382977,
+            "y": 274.1635709737812,
+            "type": "turn",
+            "direction": "forward",
+            "velocity": 1,
+            "comment": ""
+        },
+        {
+            "x": 337.44837194417966,
+            "y": 274.1635709737812,
+            "type": "turn",
+            "direction": "forward",
+            "velocity": 1,
+            "comment": ""
+        },
+        {
+            "x": 337.4483719441796,
+            "y": 29.525739188295404,
+            "type": "turn",
+            "direction": "forward",
+            "velocity": 1,
+            "comment": ""
+        }
+    ],
+    "robotClassField": "driveTrain"
+}

@@ -1,0 +1,15 @@
+{
+  "name": "node_env",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^9.4.4"
+  },
+  "dependencies": {}
+}
