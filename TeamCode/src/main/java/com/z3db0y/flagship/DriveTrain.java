@@ -112,7 +112,7 @@ public class DriveTrain {
                     break;
             }
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * 1);
+            motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * velocity);
         }
     }
 
@@ -161,19 +161,48 @@ public class DriveTrain {
         }
     }
 
+    public void driveFieldCentric(double forwardVelo, double turnVelo, double strafeVelo, double angle) {
+        double[] velocities = new double[4];
+        velocities[0] = forwardVelo - turnVelo - strafeVelo;
+        velocities[1] = forwardVelo + turnVelo + strafeVelo;
+        velocities[2] = forwardVelo - turnVelo + strafeVelo;
+        velocities[3] = forwardVelo + turnVelo - strafeVelo;
+
+        double max = Arrays.stream(velocities).max().getAsDouble();
+        double min = Arrays.stream(velocities).min().getAsDouble();
+
+        if (max > 1 || min < -1) {
+            double scale = 1 / Math.max(Math.abs(max), Math.abs(min));
+            for (int i = 0; i < velocities.length; i++) {
+                velocities[i] *= scale;
+            }
+        }
+
+        for (int i = 0; i < velocities.length; i++) {
+            velocities[i] *= Math.cos(angle);
+        }
+
+        for (MotorWithLocation motor : this.motors) {
+            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * velocities[motor.location.ordinal()]);
+        }
+    }
+
+    // KEEP THE SAME HADING ANGLE
     public void drive(int ticks, double velocity, Direction direction) {
+        int left = 0;
+        int right = 0;
         switch (direction) {
             case FORWARD:
-                runTicks(ticks, ticks, velocity);
+                left = ticks;
+                right = ticks;
                 break;
             case BACKWARD:
-                runTicks(-ticks, -ticks, velocity);
+                left = -ticks;
+                right = -ticks;
                 break;
         }
-        // Wait for motors to finish
-        while (isBusy()) {
-            Log.d("DriveTrain", "Waiting for motors to finish");
-        }
+        runTicks(left, right, velocity);
     }
 
     public void driveCM(double cm, double velocity, Direction direction) {
@@ -183,6 +212,7 @@ public class DriveTrain {
         drive(ticks, velocity, direction);
     }
 
+    // Todo: keep the same heading
     public void strafe(int ticks, double velocity, Direction direction) {
         switch (direction){
             case LEFT:
@@ -250,7 +280,8 @@ public class DriveTrain {
                 current = imu.getAngularOrientation().firstAngle + 180;
                 diff = normalizeAngle(target - current);
             }
-        } else {
+        } 
+        else {
             while (diff < -padding) {
                 driveRobotCentric(0, -velocity, 0);
                 current = imu.getAngularOrientation().firstAngle + 180;
