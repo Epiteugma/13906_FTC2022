@@ -46,14 +46,15 @@ public class AutonomousOpMode extends Common {
     }
 
     private void initCommon() {
-        initCamera();
-        initDetector();
+//        initCamera();
+//        initDetector();
     }
 
     private void run() {
-        while (opModeIsActive()) {
-            telemetry.addData("Status", "Running");
-            telemetry.update();
-        }
+        driveTrain.driveCM(50, 1, DriveTrain.Direction.FORWARD);
+        driveTrain.turn(90, 1, 3, imu);
+        driveTrain.driveCM(50, 1, DriveTrain.Direction.FORWARD);
+        driveTrain.turn(0, 1, 3, imu);
+        driveTrain.driveCM(50, 1, DriveTrain.Direction.FORWARD);
     }
 }

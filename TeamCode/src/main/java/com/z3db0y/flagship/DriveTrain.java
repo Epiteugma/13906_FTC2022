@@ -111,8 +111,14 @@ public class DriveTrain {
                     motor.setRelativeTargetPosition(right);
                     break;
             }
+            Log.i("DriveTrain", "Setting motor " + motor.location + " to " + motor.getTargetPosition());
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * velocity);
+        }
+        while(this.isBusy()){
+            for (MotorWithLocation motor : this.motors) {
+                Log.i("Current Ticks:", "of " + motor.location + "are " + motor.getCurrentPosition());
+            }
         }
     }
 
@@ -272,19 +278,19 @@ public class DriveTrain {
     }
 
     public void turn(double target, double velocity, double padding, BNO055IMU imu) {
-        double current = imu.getAngularOrientation().firstAngle + 180;
+        double current = imu.getAngularOrientation().firstAngle;
         double diff = normalizeAngle(target - current);
         if (diff > 0) {
             while (diff > padding) {
                 driveRobotCentric(0, velocity, 0);
-                current = imu.getAngularOrientation().firstAngle + 180;
+                current = imu.getAngularOrientation().firstAngle;
                 diff = normalizeAngle(target - current);
             }
         } 
         else {
             while (diff < -padding) {
                 driveRobotCentric(0, -velocity, 0);
-                current = imu.getAngularOrientation().firstAngle + 180;
+                current = imu.getAngularOrientation().firstAngle;
                 diff = normalizeAngle(target - current);
             }
         }
