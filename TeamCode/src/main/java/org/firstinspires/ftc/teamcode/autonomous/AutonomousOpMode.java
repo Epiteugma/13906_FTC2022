@@ -51,10 +51,10 @@ public class AutonomousOpMode extends Common {
     }
 
     private void run() {
-        driveTrain.driveCM(50, 1, DriveTrain.Direction.FORWARD);
+//        driveTrain.driveCM(50, 1, DriveTrain.Direction.FORWARD);
         driveTrain.turn(90, 1, 3, imu);
-        driveTrain.driveCM(50, 1, DriveTrain.Direction.FORWARD);
+//        driveTrain.driveCM(50, 1, DriveTrain.Direction.FORWARD);
         driveTrain.turn(0, 1, 3, imu);
-        driveTrain.driveCM(50, 1, DriveTrain.Direction.FORWARD);
+//        driveTrain.driveCM(50, 1, DriveTrain.Direction.FORWARD);
     }
 }

@@ -167,33 +167,6 @@ public class DriveTrain {
         }
     }
 
-    public void driveFieldCentric(double forwardVelo, double turnVelo, double strafeVelo, double angle) {
-        double[] velocities = new double[4];
-        velocities[0] = forwardVelo - turnVelo - strafeVelo;
-        velocities[1] = forwardVelo + turnVelo + strafeVelo;
-        velocities[2] = forwardVelo - turnVelo + strafeVelo;
-        velocities[3] = forwardVelo + turnVelo - strafeVelo;
-
-        double max = Arrays.stream(velocities).max().getAsDouble();
-        double min = Arrays.stream(velocities).min().getAsDouble();
-
-        if (max > 1 || min < -1) {
-            double scale = 1 / Math.max(Math.abs(max), Math.abs(min));
-            for (int i = 0; i < velocities.length; i++) {
-                velocities[i] *= scale;
-            }
-        }
-
-        for (int i = 0; i < velocities.length; i++) {
-            velocities[i] *= Math.cos(angle);
-        }
-
-        for (MotorWithLocation motor : this.motors) {
-            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * velocities[motor.location.ordinal()]);
-        }
-    }
-
     // KEEP THE SAME HADING ANGLE
     public void drive(int ticks, double velocity, Direction direction) {
         int left = 0;
@@ -277,25 +250,54 @@ public class DriveTrain {
         return angle;
     }
 
+    // 90 degrees is to the right
+    // -90 degrees is to the left
     public void turn(double target, double velocity, double padding, BNO055IMU imu) {
-        double current = imu.getAngularOrientation().firstAngle;
+        double startAngle = imu.getAngularOrientation().firstAngle;
+        double current = normalizeAngle(imu.getAngularOrientation().firstAngle);
         double diff = normalizeAngle(target - current);
-        if (diff > 0) {
-            while (diff > padding) {
+        while (Math.abs(diff) > padding) {
+            current = normalizeAngle(imu.getAngularOrientation().firstAngle);
+            diff = normalizeAngle(target - current);
+            double diffPercent = Math.abs(diff / target);
+            velocity = Math.abs(diffPercent * velocity);
+            Log.i("DriveTrain", "Current: " + current + " Target: " + target + " Diff: " + diff +  "diffPercent: " + diffPercent + "velocity: " + velocity);
+            if (diff > 0) {
                 driveRobotCentric(0, velocity, 0);
-                current = imu.getAngularOrientation().firstAngle;
-                diff = normalizeAngle(target - current);
             }
-        } 
-        else {
-            while (diff < -padding) {
+            else {
                 driveRobotCentric(0, -velocity, 0);
-                current = imu.getAngularOrientation().firstAngle;
-                diff = normalizeAngle(target - current);
             }
         }
+        Log.i("DriveTrain", "Turned to " + target + " from " + startAngle);
         driveRobotCentric(0, 0, 0);
     }
 
     // TODO: maybe add a drive field centric method
+    public void driveFieldCentric(double forwardVelo, double turnVelo, double strafeVelo, double angle) {
+        double[] velocities = new double[4];
+        velocities[0] = forwardVelo - turnVelo - strafeVelo;
+        velocities[1] = forwardVelo + turnVelo + strafeVelo;
+        velocities[2] = forwardVelo - turnVelo + strafeVelo;
+        velocities[3] = forwardVelo + turnVelo - strafeVelo;
+
+        double max = Arrays.stream(velocities).max().getAsDouble();
+        double min = Arrays.stream(velocities).min().getAsDouble();
+
+        if (max > 1 || min < -1) {
+            double scale = 1 / Math.max(Math.abs(max), Math.abs(min));
+            for (int i = 0; i < velocities.length; i++) {
+                velocities[i] *= scale;
+            }
+        }
+
+        for (int i = 0; i < velocities.length; i++) {
+            velocities[i] *= Math.cos(angle);
+        }
+
+        for (MotorWithLocation motor : this.motors) {
+            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * velocities[motor.location.ordinal()]);
+        }
+    }
 }
