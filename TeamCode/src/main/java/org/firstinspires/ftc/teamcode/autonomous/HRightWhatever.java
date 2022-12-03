@@ -7,4 +7,10 @@ import org.firstinspires.ftc.teamcode.Flags;
 
 @Flags(robotType = Enums.RobotType.H_DRIVE, alliance = Enums.Alliance.BLUE, side = Enums.Side.RIGHT)
 @Autonomous(name = "HRightWhatever")
-public class HRightWhatever extends AutonomousOpMode{}
+public class HRightWhatever extends AutonomousOpMode {
+
+    @Override
+    public void run() {
+        // Your code here
+    }
+}

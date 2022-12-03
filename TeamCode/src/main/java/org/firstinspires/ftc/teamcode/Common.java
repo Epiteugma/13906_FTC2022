@@ -5,11 +5,13 @@ import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.z3db0y.flagship.DriveTrain;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 public class Common extends LinearOpMode {
+    public Flags flags = this.getClass().isAnnotationPresent(Flags.class) ? this.getClass().getAnnotation(Flags.class) : null;
     public WebcamName webcamName;
     public DriveTrain.MotorWithLocation frontLeft;
     public DriveTrain.MotorWithLocation frontRight;
@@ -21,6 +23,7 @@ public class Common extends LinearOpMode {
     public Rev2mDistanceSensor frontDistance;
     public DriveTrain driveTrain;
     public BNO055IMU imu;
+    public Servo cameraBase;
 
     @Override public void runOpMode() {}
 

@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -191,7 +192,7 @@ public class DriveTrain {
         drive(ticks, velocity, direction);
     }
 
-    // Todo: keep the same heading
+   // Todo: keep the same heading
     public void strafe(int ticks, double velocity, Direction direction) {
         switch (direction){
             case LEFT:
@@ -250,18 +251,19 @@ public class DriveTrain {
         return angle;
     }
 
-    // 90 degrees is to the right
-    // -90 degrees is to the left
-    public void turn(double target, double velocity, double padding, BNO055IMU imu) {
+    public void turn(double target, double velocity, BNO055IMU imu) {
+        double padding = 1;
         double startAngle = imu.getAngularOrientation().firstAngle;
         double current = normalizeAngle(imu.getAngularOrientation().firstAngle);
-        double diff = normalizeAngle(target - current);
+        double startingDiff = normalizeAngle(target - current);
+        double initialVelcity = velocity;
+        double diff = startingDiff;
         while (Math.abs(diff) > padding) {
             current = normalizeAngle(imu.getAngularOrientation().firstAngle);
             diff = normalizeAngle(target - current);
-            double diffPercent = Math.abs(diff / target);
-            velocity = Math.abs(diffPercent * velocity);
-            Log.i("DriveTrain", "Current: " + current + " Target: " + target + " Diff: " + diff +  "diffPercent: " + diffPercent + "velocity: " + velocity);
+            double diffPercent = Math.abs(diff / startingDiff);
+            velocity = Range.clip(Math.abs(diffPercent * initialVelcity), 0.35, 1);
+            Log.i("DriveTrain", "Current: " + current + " Target: " + target + " Diff: " + diff +  " diffPercent: " + diffPercent + "velocity: " + velocity);
             if (diff > 0) {
                 driveRobotCentric(0, velocity, 0);
             }
@@ -269,7 +271,7 @@ public class DriveTrain {
                 driveRobotCentric(0, -velocity, 0);
             }
         }
-        Log.i("DriveTrain", "Turned to " + target + " from " + startAngle);
+        Log.i("DriveTrain", "Turned to " + target + " from " + startAngle + " current: " + current);
         driveRobotCentric(0, 0, 0);
     }
 

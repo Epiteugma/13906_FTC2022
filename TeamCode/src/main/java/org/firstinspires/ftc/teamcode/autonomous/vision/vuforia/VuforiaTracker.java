@@ -5,6 +5,8 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XZY;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 
+import android.util.Log;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
@@ -77,10 +79,14 @@ public class VuforiaTracker {
     public void update() {
         trackable = recognizeTarget();
         if (trackable != null) {
+            Log.i("Vuforia", "Visible Target: " + trackable.getName());
             OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener) trackable.getListener()).getUpdatedRobotLocation();
             if (robotLocationTransform != null) {
                 lastLocation = robotLocationTransform;
             }
+        }
+        else{
+            Log.i("Vuforia", "No Target Visible");
         }
     }
 
@@ -96,11 +102,17 @@ public class VuforiaTracker {
     }
 
     public float[] getLocation(){
-
-        float robotX = (lastLocation.getTranslation().get(0) + halfField) / 10;
-        float robotY = (lastLocation.getTranslation().get(1) + halfField) / 10;
-        float robotZ = (lastLocation.getTranslation().get(2)) / 10;
-        return new float[]{robotX, robotY, robotZ};
+        // shift the position 90 degrees clockwise to make it relative to the audience wall
+        float[] location = lastLocation.getTranslation().getData();
+        float x = location[0];
+        float y = location[1];
+        float z = location[2];
+        float[] newLocation = new float[3];
+        newLocation[0] = y;
+        newLocation[1] = x;
+        newLocation[2] = z;
+        Log.i("Vuforia", "Location: " + newLocation[0] + ", " + newLocation[1] + ", " + newLocation[2]);
+        return newLocation;
     }
 
     public String formatMatrix(OpenGLMatrix matrix){

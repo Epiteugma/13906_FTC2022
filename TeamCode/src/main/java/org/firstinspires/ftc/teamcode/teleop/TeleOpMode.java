@@ -17,8 +17,7 @@ public class TeleOpMode extends Common {
 
     @Override
     public void runOpMode() {
-        if(this.getClass().isAnnotationPresent(Flags.class)) {
-            Flags flags = this.getClass().getAnnotation(Flags.class);
+        if(flags != null) {
             if(flags.robotType() == Enums.RobotType.X_DRIVE) this.initXDrive();
             else if(flags.robotType() == Enums.RobotType.H_DRIVE) this.initHDrive();
 

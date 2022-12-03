@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.autonomous;
+package org.firstinspires.ftc.teamcode.autonomous.Red.Left;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -106,9 +106,9 @@ public class RedLeft extends LinearOpMode{
         telemetry.addData("Parking Position", parkingPosition.name());
         /// START OF AUTONOMOUS ///
         driveTrain.driveCM(70.42153540919753, 1, DriveTrain.Direction.FORWARD);
-        driveTrain.turn(90, 1, 3, imu);
+        driveTrain.turn(90, 1, imu);
         driveTrain.driveCM(310.5175208803499, 1, DriveTrain.Direction.FORWARD);
-        driveTrain.turn(0, 1, 3, imu);
+        driveTrain.turn(0, 1, imu);
         driveTrain.driveCM(244.6378317854858, 1, DriveTrain.Direction.FORWARD);
         vuforiaTracker.update();
         trackable = vuforiaTracker.recognizeTarget();
