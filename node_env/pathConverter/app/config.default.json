@@ -6,5 +6,6 @@
     "path": [],
     "robotClassName": "",
     "obstaclesFile": "",
-    "functionsFile": ""
+    "functionsFile": "",
+    "invertTurn": false
 }

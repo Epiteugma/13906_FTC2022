@@ -1,3 +1,4 @@
+require('./prompt_polyfill');
 const appContainer = document.getElementById('app');
 const { config } = require('./common');
 
@@ -27,6 +28,11 @@ title.innerText = 'Field Preview';
 appContainer.appendChild(title);
 document.getElementById('wrapper').appendChild(canvas);
 
+let presetTitle = document.createElement('h2');
+presetTitle.innerText = 'Presets';
+let presetContainer = document.createElement('div');
+presetContainer.id = 'presetContainer';
+
 let controlsTitle = document.createElement('h2');
 controlsTitle.innerText = 'Controls';
 let controls = document.createElement('div');
@@ -35,6 +41,8 @@ addPathControls();
 addObstaclesControls();
 addFieldControls();
 addExportControls();
+appContainer.appendChild(presetTitle);
+appContainer.appendChild(presetContainer);
 appContainer.appendChild(controlsTitle);
 appContainer.appendChild(controls);
 
@@ -56,6 +64,44 @@ function updateFieldSize() {
     canvas.width = config.get('field.width');
     canvas.height = config.get('field.height');
 }
+
+function addPresets(quantity) {
+    for(let i = 0; i < quantity; i++) {
+        let preset = document.createElement('div');
+        preset.className = 'preset';
+
+        let presetButtonContainer = document.createElement('div');
+        presetButtonContainer.className = 'presetButtonContainer';
+        presetButtonContainer.style.width = '100%';
+        presetButtonContainer.style.display = 'flex';
+        presetButtonContainer.style.justifyContent = 'flex-end';
+        preset.appendChild(presetButtonContainer);
+
+        let saveButton = document.createElement('button');
+        saveButton.className = 'savePreset';
+        saveButton.innerText = 'save';
+        saveButton.style.fontFamily = 'Material Symbols Outlined';
+        saveButton.addEventListener('click', () => {
+            // Todo
+            prompt('Test');
+        });
+        saveButton.style.marginRight = '3px';
+        presetButtonContainer.appendChild(saveButton);
+
+        let deleteButton = document.createElement('button');
+        deleteButton.className = 'deletePreset';
+        deleteButton.innerText = 'delete';
+        deleteButton.style.fontFamily = 'Material Symbols Outlined';
+        deleteButton.addEventListener('click', () => {
+            // Todo
+            confirm('Are you sure you want to delete this preset?');
+        });
+        presetButtonContainer.appendChild(deleteButton);
+
+        presetContainer.appendChild(preset);
+    }
+}
+addPresets(9);
 
 function findClosest45DdegreePoint(point, anchor) {
     let angle = Math.atan2(point.y - anchor.y, point.x - anchor.x);
@@ -325,6 +371,29 @@ function addExportControls() {
     functionFileI.accept = '.json';
     functionFileI.addEventListener('input', handleFunctions);
     functionFileC.appendChild(functionFileI);
+
+    let invertTurnC = document.createElement('div');
+    invertTurnC.className = 'control';
+    invertTurnC.innerText = 'Invert turn';
+    let invertTurnSwitch = document.createElement('label');
+    invertTurnSwitch.className = 'switch';
+    invertTurnSwitch.style.width = '10%';
+    invertTurnSwitch.style.display = 'flex';
+    let invertTurnInput = document.createElement('input');
+    invertTurnInput.type = 'checkbox';
+    invertTurnInput.checked = config.get('invertTurn');
+    invertTurnInput.addEventListener('input', (event) => config.set('invertTurn', event.target.checked));
+    invertTurnInput.style.width = '0';
+    invertTurnInput.style.height = '0';
+    invertTurnInput.style.margin = '0';
+    let invertTurnSlider = document.createElement('span');
+    invertTurnSlider.className = 'slider';
+    invertTurnSlider.style.width = '100%';
+    invertTurnSlider.style.height = '100%';
+    invertTurnSwitch.appendChild(invertTurnInput);
+    invertTurnSwitch.appendChild(invertTurnSlider);
+    invertTurnC.appendChild(invertTurnSwitch);
+
     let exportBtnC = document.createElement('div');
     exportBtnC.className = 'control';
     let exportBtn = document.createElement('button');
@@ -334,6 +403,7 @@ function addExportControls() {
 
     controls.appendChild(robotClassNameC);
     controls.appendChild(functionFileC);
+    controls.appendChild(invertTurnC);
     controls.appendChild(exportBtnC);
 }
 
@@ -472,6 +542,7 @@ async function exportPath() {
     }
     if(!functions) return alert('Please load functions file first!');
     let path = config.get('path');
+    let invertTurn = config.get('invertTurn');
     let code = '';
     let className = config.get('robotClassField');
 
@@ -483,7 +554,7 @@ async function exportPath() {
         let direction = path[i].direction;
         let type = path[i].type;
         let comment = path[i].comment;
-        let targetAngle = Math.round(Math.atan2(y, x) * 180 / Math.PI + 90);
+        let targetAngle = (invertTurn ? -1 : 1) * Math.round(Math.atan2(y, x) * 180 / Math.PI + 90);
         let distance = Math.sqrt(x * x + y * y);
 
         let prefix = (className || 'this') + '.';
