@@ -27,28 +27,31 @@ public class Common extends LinearOpMode {
 
     @Override public void runOpMode() {}
 
-    public void initXDrive() {
+    public void initBoxDrive() {
         double gearRatio = 15.0;
         double wheelDiameter = 9;
-        backLeft = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "backLeft"), DriveTrain.MotorWithLocation.Location.FRONT);
-        backRight = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "backRight"), DriveTrain.MotorWithLocation.Location.RIGHT);
-        frontLeft = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "frontLeft"), DriveTrain.MotorWithLocation.Location.LEFT);
-        frontRight = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "frontRight"), DriveTrain.MotorWithLocation.Location.BACK);
 
-        leftDistance = hardwareMap.get(Rev2mDistanceSensor.class, "leftDistance");
-        rightDistance = hardwareMap.get(Rev2mDistanceSensor.class, "rightDistance");
-        backDistance = hardwareMap.get(Rev2mDistanceSensor.class, "backDistance");
-        frontDistance = hardwareMap.get(Rev2mDistanceSensor.class, "frontDistance");
+        backLeft = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "backLeft"), DriveTrain.MotorWithLocation.Location.BACK_LEFT);
+        backRight = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "backRight"), DriveTrain.MotorWithLocation.Location.BACK_RIGHT);
+        frontLeft = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "frontLeft"), DriveTrain.MotorWithLocation.Location.FRONT_LEFT);
+        frontRight = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "frontRight"), DriveTrain.MotorWithLocation.Location.FRONT_RIGHT);
+
+//        leftDistance = hardwareMap.get(Rev2mDistanceSensor.class, "leftDistance");
+//        rightDistance = hardwareMap.get(Rev2mDistanceSensor.class, "rightDistance");
+//        backDistance = hardwareMap.get(Rev2mDistanceSensor.class, "backDistance");
+//        frontDistance = hardwareMap.get(Rev2mDistanceSensor.class, "frontDistance");
 
         frontRight.setDirection(DcMotorImplEx.Direction.REVERSE);
-        backRight.setDirection(DcMotorImplEx.Direction.REVERSE);
+        backLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
+//        left.setDirection(DcMotorImplEx.Direction.REVERSE);
+//        front.setDirection(DcMotorImplEx.Direction.REVERSE);
 
-        backLeft.setHoldPosition(true);
-        backRight.setHoldPosition(true);
-        frontLeft.setHoldPosition(true);
         frontRight.setHoldPosition(true);
+        frontLeft.setHoldPosition(true);
+        backRight.setHoldPosition(true);
+        backLeft.setHoldPosition(true);
 
-        driveTrain = new DriveTrain(DriveTrain.Type.X_DRIVE, new DriveTrain.MotorWithLocation[]{backLeft, backRight, frontLeft, frontRight}, wheelDiameter, gearRatio);
+        driveTrain = new DriveTrain(DriveTrain.Type.MECANUM, new DriveTrain.MotorWithLocation[]{frontLeft, backRight, frontRight, backLeft}, wheelDiameter, gearRatio);
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();

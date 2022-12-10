@@ -2,7 +2,11 @@ package org.firstinspires.ftc.teamcode.autonomous.vision.sleeveRecognition;
 
 import static android.os.SystemClock.sleep;
 
+import android.util.Log;
+
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -13,6 +17,7 @@ import java.util.ArrayList;
 public class Detection {
     OpenCvCamera camera;
     AprilTagDetectionPipeline pipeline;
+    VuforiaLocalizer vuforiaHook;
     public CameraState cameraState = CameraState.CLOSED;
 
     enum CameraState {
@@ -50,11 +55,14 @@ public class Detection {
 
     public void waitForCamera() {
         while(cameraState == CameraState.OPENING || cameraState == CameraState.CLOSED) {
-            sleep(10);
+            Log.i("Camera", "Waiting for camera to open");
+            sleep(100);
         }
     }
 
     public void stop() {
         this.camera.closeCameraDevice();
+        Log.i("Camera", "Camera closed");
+        sleep(1000);
     }
 }

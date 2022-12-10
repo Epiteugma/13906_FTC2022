@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import android.util.Log;
 
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.z3db0y.flagship.DriveTrain;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -52,7 +53,7 @@ public class AutonomousOpMode extends Common {
         }
         if(flags != null) {
 
-            if(flags.robotType() == Enums.RobotType.X_DRIVE) this.initXDrive();
+            if(flags.robotType() == Enums.RobotType.X_DRIVE) this.initBoxDrive();
             else if(flags.robotType() == Enums.RobotType.H_DRIVE) this.initHDrive();
 
             this.initCommon();
@@ -73,6 +74,8 @@ public class AutonomousOpMode extends Common {
     ParkingPosition defaultParkingPosition = ParkingPosition.CENTER;
     JSONObject map;
     float[] coneStackLocation;
+    ArrayList<AprilTagDetection> detections;
+    ParkingPosition parkingPosition = defaultParkingPosition;
 
 
     void initCameraModule(){
@@ -164,13 +167,28 @@ public class AutonomousOpMode extends Common {
 
     public void run() {
         detector.waitForCamera();
-        ArrayList<AprilTagDetection> detections = detector.getRecognitions();
-        ParkingPosition parkingPosition = defaultParkingPosition;
-        if(detections.size() > 0) {
-            parkingPosition = ParkingPosition.values()[detections.get(0).id];
+        detections = detector.getRecognitions();
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+        while(detections.size() < 1){
+            detections = detector.getRecognitions();
+            telemetry.addData("Status", "Recognizing...");
+            if(detections.size() > 0) {
+                telemetry.addData("Status", "Recognized");
+                parkingPosition = ParkingPosition.values()[detections.get(0).id];
+                break;
+            }
+            if(timer.milliseconds() > 5000) {
+                telemetry.addData("Status", "No tags detected, default");
+                break;
+            }
+            telemetry.update();
         }
-        detector.stop();
+
         telemetry.addData("Parking Position", parkingPosition.name());
+//        detector.stop();
+        telemetry.addData("Status", "Initialized tracker");
+        telemetry.update();
         if(flags.side() == Enums.Side.LEFT){
             cameraBase.setPosition(-90);
             if(flags.alliance() == Enums.Alliance.BLUE) {

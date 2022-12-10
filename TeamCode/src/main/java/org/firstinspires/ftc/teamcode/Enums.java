@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 public class Enums {
     public enum RobotType {
+        BOX_DRIVE,
         X_DRIVE,
         H_DRIVE;
     }
