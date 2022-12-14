@@ -39,7 +39,7 @@ public class AutonomousOpMode extends Common {
     VuforiaLocalizer vuforia;
     VuforiaTracker vuforiaTracker;
     VuforiaTrackable trackable;
-    float[] robotLocation;
+    float[] robotLocation = {0, 0, 0};
     OpenGLMatrix trackableLocation;
     ParkingPosition defaultParkingPosition = ParkingPosition.CENTER;
     JSONObject map;
@@ -64,8 +64,12 @@ public class AutonomousOpMode extends Common {
     public void runOpMode() {
         try {
             map = (JSONObject) new JSONTokener(readFile("map.json")).nextValue();
+            Logger.addData("Map" +map.toString());
+            Logger.update();
         }
         catch (JSONException e) {
+            Logger.addData("Map" +e.getMessage());
+            Logger.update();
             e.printStackTrace();
         }
         if(flags != null) {
@@ -82,6 +86,7 @@ public class AutonomousOpMode extends Common {
 
     void initSleeveDetector() {
         WebcamName easyOpenCvWebcam = hardwareMap.get(WebcamName.class, "easyOpenCvWebcam");
+        easyOpenCvViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         this.detector = new Detection(easyOpenCvWebcam, easyOpenCvViewId);
         this.detector.init(5.32, 1932, 1932, 648, 648);
         this.detector.waitForCamera();
@@ -99,36 +104,35 @@ public class AutonomousOpMode extends Common {
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
         vuforiaTracker = new VuforiaTracker(vuforia, vuforiaWebcam, vuforiaViewId);
         vuforiaTracker.init();
-        Logger.addData("Status", "Initialized vuforia tracker");
+        Logger.addData("Status" +"Initialized vuforia tracker");
         Logger.update();
     }
 
     private void initCommon() {
         Logger.setTelemetry(new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()));
         initSleeveDetector();
-        initVuforia();
     }
 
     public ParkingPosition sleeveDetection(double maxTime) {
         detections = detector.getRecognitions();
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
-        while(detections.size() < 1){
+        while(true){
             detections = detector.getRecognitions();
-            Logger.addData("Status", "Recognizing...");
+            Logger.addData("Status Recognizing...");
             if(detections.size() > 0) {
-                Logger.addData("Status", "Recognized");
+                Logger.addData("Status Recognized");
                 parkingPosition = ParkingPosition.values()[detections.get(0).id];
                 break;
             }
             if(timer.milliseconds() > maxTime) {
-                Logger.addData("Status", "No tags detected, default");
+                Logger.addData("Status No tags detected, default");
                 break;
             }
             Logger.update();
         }
         detector.stop();
-        Logger.addData("Parking Position: ", parkingPosition.name());
+        Logger.addData("Parking Position: " + parkingPosition.name());
         Logger.update();
         return parkingPosition;
     }
@@ -148,14 +152,17 @@ public class AutonomousOpMode extends Common {
     }
 
     public float[] getConeStackLocation(String name) {
-        JSONArray coneStackLocation = null;
+        JSONObject coneStackLocation = null;
         try {
-            coneStackLocation = map.getJSONObject("coneStacks").getJSONArray(name);
+            coneStackLocation = map.getJSONObject("objects").getJSONObject("coneStacks").getJSONObject(name);
+            telemetry.addData("coneStackLocation", map.getJSONObject("map").getJSONObject("coneStacks"));
+            telemetry.update();
+            Log.i("coneStackLocation", map.getJSONObject("coneStacks").toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
         try {
-            return new float[]{(float) coneStackLocation.getDouble(0), (float) coneStackLocation.getDouble(1), (float) coneStackLocation.getDouble(2)};
+            return new float[]{(float) coneStackLocation.getDouble("x"), (float) coneStackLocation.getDouble("y"), (float) coneStackLocation.getDouble("z")};
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -166,14 +173,9 @@ public class AutonomousOpMode extends Common {
     public void pickUpCone(){}
 
     public void driveToConeStack(){
-        while(!vuforiaTracker.targetVisible()) {
-            // no need to update the location because it is done in the vuforia thread
-            Log.i("Vuforia", "No target visible");
-        }
-        robotLocation = vuforiaTracker.getLocation();
         // triangulate the path to the cone stack strafeCM turn to face the stack and drive to the stack
-        Logger.addData("Robot Location", robotLocation[0] + ", " + robotLocation[1] + ", " + robotLocation[2]);
-        Logger.addData("Cone Stack Location", coneStackLocation[0] + ", " + coneStackLocation[1] + ", " + coneStackLocation[2]);
+        Logger.addData("Robot Location " + robotLocation[0] + " " + robotLocation[1] + " " + robotLocation[2]);
+        Logger.addData("Cone Stack Location " + coneStackLocation[0] + " " + coneStackLocation[1] + " " + coneStackLocation[2]);
         Logger.update();
         double yDistance = coneStackLocation[1] - robotLocation[1];
         double xDistance = (coneStackLocation[0] - robotLocation[0]) - 5; // we want to go just in front of the stack
@@ -188,23 +190,17 @@ public class AutonomousOpMode extends Common {
         driveTrain.driveCM(xDistance, 1, DriveTrain.Direction.FORWARD);
     }
 
-//    Thread vuforiaThread = new Thread(new Runnable() {
-//        while (opModeIsActive()) {
-//            vuforiaTracker.update();
-//            robotLocation = vuforiaTracker.getLocation();
-//        }
-//    });
-
     public void run() {
         parkingPosition = sleeveDetection(3000);
-        new Thread(new Runnable() {
+        initVuforia();
+        new Thread(() -> {
             while (opModeIsActive()) {
                 vuforiaTracker.update();
                 robotLocation = vuforiaTracker.getLocation();
             }
         }).start();
         if(flags.side() == Enums.Side.LEFT){
-            cameraBase.setPosition(-90);
+//            cameraBase.setPosition(-90);
             if(flags.alliance() == Enums.Alliance.BLUE) {
                 coneStackLocation = getConeStackLocation("blueUp");
             }
@@ -213,7 +209,7 @@ public class AutonomousOpMode extends Common {
             }
         }
         else if(flags.side() == Enums.Side.RIGHT){
-            cameraBase.setPosition(90);
+//            cameraBase.setPosition(90);
             if(flags.alliance() == Enums.Alliance.BLUE) {
                 coneStackLocation = getConeStackLocation("blueDown");
             }

@@ -105,16 +105,21 @@ public class VuforiaTracker {
         return trackable != null;
     }
 
+    public float[] shift90(float[] input) {
+        float[] output = new float[3];
+        output[0] = input[1];
+        output[1] = -input[0];
+        output[2] = input[2];
+        return output;
+    }
+
     public float[] getLocation(){
+        if(!targetVisible()){
+            Log.i("Vuforia", "No Target Visible, hence returning previous location");
+        }
         // shift the position 90 degrees clockwise to make it relative to the audience wall
         float[] location = lastLocation.getTranslation().getData();
-        float x = location[0];
-        float y = location[1];
-        float z = location[2];
-        float[] newLocation = new float[3];
-        newLocation[0] = y;
-        newLocation[1] = x;
-        newLocation[2] = z;
+        float [] newLocation = shift90(location);
         Log.i("Vuforia", "Location: " + newLocation[0] + ", " + newLocation[1] + ", " + newLocation[2]);
         return newLocation;
     }

@@ -7,6 +7,6 @@ import org.firstinspires.ftc.robotcore.internal.vuforia.VuforiaLocalizerImpl;
 public class DetectionV3 {
 
     public void t() {
-        ClassFactoryImpl
+//        ClassFactoryImpl
     }
 }
