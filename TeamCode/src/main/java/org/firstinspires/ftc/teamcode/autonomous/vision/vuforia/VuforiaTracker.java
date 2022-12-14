@@ -101,6 +101,10 @@ public class VuforiaTracker {
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, rx, ry, rz)));
     }
 
+    public boolean targetVisible() {
+        return trackable != null;
+    }
+
     public float[] getLocation(){
         // shift the position 90 degrees clockwise to make it relative to the audience wall
         float[] location = lastLocation.getTranslation().getData();
