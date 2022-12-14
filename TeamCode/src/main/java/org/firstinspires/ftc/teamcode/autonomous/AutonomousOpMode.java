@@ -188,16 +188,21 @@ public class AutonomousOpMode extends Common {
         driveTrain.driveCM(xDistance, 1, DriveTrain.Direction.FORWARD);
     }
 
-    Thread vuforiaThread = new Thread(new Runnable() {
-        while (opModeIsActive()) {
-            vuforiaTracker.update();
-            robotLocation = vuforiaTracker.getLocation();
-        }
-    });
+//    Thread vuforiaThread = new Thread(new Runnable() {
+//        while (opModeIsActive()) {
+//            vuforiaTracker.update();
+//            robotLocation = vuforiaTracker.getLocation();
+//        }
+//    });
 
     public void run() {
         parkingPosition = sleeveDetection(3000);
-        vuforiaThread.start();
+        new Thread(new Runnable() {
+            while (opModeIsActive()) {
+                vuforiaTracker.update();
+                robotLocation = vuforiaTracker.getLocation();
+            }
+        }).start();
         if(flags.side() == Enums.Side.LEFT){
             cameraBase.setPosition(-90);
             if(flags.alliance() == Enums.Alliance.BLUE) {
