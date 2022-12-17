@@ -44,9 +44,9 @@ public class VuforiaTracker {
         List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
         allTrackables.addAll(targets);
 
-        final float CAMERA_FORWARD_DISPLACEMENT = 0.33f * 1000;
-        final float CAMERA_VERTICAL_DISPLACEMENT = 0.22f * 1000;
-        final float CAMERA_LEFT_DISPLACEMENT = 0.15f * 1000;
+        final float CAMERA_FORWARD_DISPLACEMENT = 0.12f * 1000;
+        final float CAMERA_VERTICAL_DISPLACEMENT = 0.8f * 1000;
+        final float CAMERA_LEFT_DISPLACEMENT = 0.30f * 1000;
 
         OpenGLMatrix cameraLocationOnRobot = OpenGLMatrix
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
@@ -116,6 +116,7 @@ public class VuforiaTracker {
     public float[] getLocation(){
         if(!targetVisible()){
             Log.i("Vuforia", "No Target Visible, hence returning previous location");
+            return new float[]{0,0,-1000}; //z = -1000 to indicate no target visible
         }
         // shift the position 90 degrees clockwise to make it relative to the audience wall
         float[] location = lastLocation.getTranslation().getData();

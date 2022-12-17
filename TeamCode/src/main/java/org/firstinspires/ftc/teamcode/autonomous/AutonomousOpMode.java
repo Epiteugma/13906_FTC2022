@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.autonomous;
 
 import android.util.Log;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.z3db0y.flagship.DriveTrain;
@@ -19,7 +20,6 @@ import org.firstinspires.ftc.teamcode.Enums;
 import org.firstinspires.ftc.teamcode.autonomous.vision.sleeveRecognition.Detection;
 import org.firstinspires.ftc.teamcode.autonomous.vision.sleeveRecognition.ParkingPosition;
 import org.firstinspires.ftc.teamcode.autonomous.vision.vuforia.VuforiaTracker;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -39,7 +39,7 @@ public class AutonomousOpMode extends Common {
     VuforiaLocalizer vuforia;
     VuforiaTracker vuforiaTracker;
     VuforiaTrackable trackable;
-    float[] robotLocation = {0, 0, 0};
+    float[] actualLocation = {0, 0, 0};
     OpenGLMatrix trackableLocation;
     ParkingPosition defaultParkingPosition = ParkingPosition.CENTER;
     JSONObject map;
@@ -93,7 +93,6 @@ public class AutonomousOpMode extends Common {
     }
 
     void initVuforia(){
-        cameraBase = hardwareMap.get(Servo.class, "cameraBase");
         // maybe it could rotate all the time like a lidar scanner???
         WebcamName vuforiaWebcam = hardwareMap.get(WebcamName.class, "vuforiaWebcam");
         vuforiaViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -104,11 +103,21 @@ public class AutonomousOpMode extends Common {
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
         vuforiaTracker = new VuforiaTracker(vuforia, vuforiaWebcam, vuforiaViewId);
         vuforiaTracker.init();
-        Logger.addData("Status" +"Initialized vuforia tracker");
+        Logger.addData("Status Initialized vuforia tracker");
         Logger.update();
     }
 
     private void initCommon() {
+        // Force stopper
+        Thread main = Thread.currentThread();
+        new Thread(() -> {
+            waitForStart();
+            while (!isStopRequested()) {}
+            try {
+                main.interrupt();
+            } catch (Exception ignored) {}
+        }).start();
+
         Logger.setTelemetry(new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()));
         initSleeveDetector();
     }
@@ -117,7 +126,7 @@ public class AutonomousOpMode extends Common {
         detections = detector.getRecognitions();
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
-        while(true){
+        while(opModeIsActive()){
             detections = detector.getRecognitions();
             Logger.addData("Status Recognizing...");
             if(detections.size() > 0) {
@@ -174,16 +183,16 @@ public class AutonomousOpMode extends Common {
 
     public void driveToConeStack(){
         // triangulate the path to the cone stack strafeCM turn to face the stack and drive to the stack
-        Logger.addData("Robot Location " + robotLocation[0] + " " + robotLocation[1] + " " + robotLocation[2]);
+        Logger.addData("Robot Location " + actualLocation[0] + " " + actualLocation[1] + " " + actualLocation[2]);
         Logger.addData("Cone Stack Location " + coneStackLocation[0] + " " + coneStackLocation[1] + " " + coneStackLocation[2]);
         Logger.update();
-        double yDistance = coneStackLocation[1] - robotLocation[1];
-        double xDistance = (coneStackLocation[0] - robotLocation[0]) - 5; // we want to go just in front of the stack
-        if(flags.side() == Enums.Side.RIGHT){
+        double yDistance = coneStackLocation[1] - actualLocation[1];
+        double xDistance = (coneStackLocation[0] - actualLocation[0]) - 5; // we want to go just in front of the stack
+        if (flags.side() == Enums.Side.RIGHT) {
             driveTrain.turn(-90, 1, imu);
             driveTrain.strafeCM(yDistance, 1, DriveTrain.Direction.LEFT);
         }
-        else if(flags.side() == Enums.Side.LEFT){
+        else if (flags.side() == Enums.Side.LEFT) {
             driveTrain.turn(90, 1, imu);
             driveTrain.strafeCM(yDistance, 1, DriveTrain.Direction.RIGHT);
         }
@@ -191,14 +200,32 @@ public class AutonomousOpMode extends Common {
     }
 
     public void run() {
-        parkingPosition = sleeveDetection(3000);
+        parkingPosition = sleeveDetection(3500);
         initVuforia();
         new Thread(() -> {
             while (opModeIsActive()) {
                 vuforiaTracker.update();
-                robotLocation = vuforiaTracker.getLocation();
+                if (vuforiaTracker.targetVisible()) {
+                    actualLocation = vuforiaTracker.getLocation();
+                }
+                else {
+                    while(!vuforiaTracker.targetVisible() && opModeIsActive()){
+                        Logger.addData("no visible, spinning servo");
+                        Logger.update();
+                        while(!vuforiaTracker.targetVisible() && opModeIsActive()) {
+                            vuforiaTracker.update();
+                            cameraBase.setPosition((Math.asin(2 * Math.PI * (cameraBase.getPosition()+0.01)) / Math.PI) % 0.5);
+                        }
+                    }
+                    Logger.addData("Stopped servo, target visible");
+                    Logger.update();
+                }
             }
         }).start();
+        DriveTrain.CorrectionHandler correctionHandler = () -> {
+            String caller = Thread.currentThread().getStackTrace()[2].getMethodName();
+        };
+        driveTrain.setCorrectionHandler(correctionHandler);
         if(flags.side() == Enums.Side.LEFT){
 //            cameraBase.setPosition(-90);
             if(flags.alliance() == Enums.Alliance.BLUE) {
@@ -224,6 +251,6 @@ public class AutonomousOpMode extends Common {
 //        driveTrain.turn(0, 1, imu);
 //        driveTrain.driveCM(50, 1, DriveTrain.Direction.FORWARD);
 //        driveTrain.turn(-90, 1, imu);
-        park(parkingPosition);
+//        park(parkingPosition);
     }
 }

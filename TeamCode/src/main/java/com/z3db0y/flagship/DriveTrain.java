@@ -11,7 +11,9 @@ import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+import org.firstinspires.ftc.teamcode.autonomous.vision.vuforia.VuforiaTracker;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -22,6 +24,15 @@ public class DriveTrain {
     double ticksPerRevolution;
     double wheelDiameter;
     double gearRatio;
+    CorrectionHandler handler;
+
+    public interface CorrectionHandler {
+        void correct();
+    }
+
+    public void setCorrectionHandler(CorrectionHandler handler) {
+        this.handler = handler;
+    }
 
     public enum Direction {
         FORWARD,
@@ -117,6 +128,7 @@ public class DriveTrain {
             motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * velocity);
         }
         while(this.isBusy()){
+            if(handler != null) handler.correct();
             for (MotorWithLocation motor : this.motors) {
                 Log.i("Current Ticks:", "of " + motor.location + "are " + motor.getCurrentPosition());
             }
@@ -132,6 +144,38 @@ public class DriveTrain {
             }
         }
         return false;
+    }
+
+    public void driveVuforia(double distance, double robotAngle, double velocity, VuforiaTracker vuforia) {
+        for (MotorWithLocation motor : this.motors) {
+            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+        double dx = Math.asin(robotAngle) * distance;
+        double dy = Math.acos(robotAngle) * distance;
+        float[] target = vuforia.getLocation();
+        target[0] += dx;
+        target[1] += dy;
+        float[] current = vuforia.getLocation();
+        while(Math.abs(target[0] - current[0]) > 1 || Math.abs(target[1] - current[1]) > 1) {
+            current = vuforia.getLocation();
+            for (MotorWithLocation motor : this.motors) {
+                switch (motor.location) {
+                    case LEFT:
+                    case BACK_LEFT:
+                    case FRONT_LEFT:
+                        motor.setVelocity(velocity * (target[0] - current[0]));
+                        break;
+                    case RIGHT:
+                    case BACK_RIGHT:
+                    case FRONT_RIGHT:
+                        motor.setVelocity(velocity * (target[1] - current[1]));
+                        break;
+                }
+            }
+        }
+        for (MotorWithLocation motor : this.motors) {
+            motor.setVelocity(0);
+        }
     }
 
     public void driveRobotCentric(double forwardVelo, double turnVelo, double strafeVelo) {
@@ -264,6 +308,7 @@ public class DriveTrain {
             double diffPercent = Math.abs(diff / startingDiff);
             velocity = Range.clip(Math.abs(diffPercent * initialVelcity), 0.35, 1);
             Log.i("DriveTrain", "Current: " + current + " Target: " + target + " Diff: " + diff +  " diffPercent: " + diffPercent + "velocity: " + velocity);
+            if(handler != null) handler.correct();
             if (diff > 0) {
                 driveRobotCentric(0, velocity, 0);
             }
