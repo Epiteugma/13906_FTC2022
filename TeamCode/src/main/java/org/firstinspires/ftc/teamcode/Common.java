@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.z3db0y.flagship.DriveTrain;
+import com.z3db0y.flagship.Motor;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
@@ -18,6 +19,9 @@ public class Common extends LinearOpMode {
     public DriveTrain.MotorWithLocation frontRight;
     public DriveTrain.MotorWithLocation backLeft;
     public DriveTrain.MotorWithLocation backRight;
+    public Motor leftSlide;
+    public Motor rightSlide;
+    public Motor rotatingBase;
     public Rev2mDistanceSensor leftDistance;
     public Rev2mDistanceSensor rightDistance;
     public Rev2mDistanceSensor backDistance;
@@ -81,6 +85,19 @@ public class Common extends LinearOpMode {
         }
 
         driveTrain = new DriveTrain(DriveTrain.Type.MECANUM, new DriveTrain.MotorWithLocation[]{backLeft, backRight, frontLeft, frontRight}, wheelDiameter, gearRatio);
+
+        rotatingBase = new Motor(hardwareMap.get(DcMotorImplEx.class, "rotatingBase"));
+        leftSlide = new Motor(hardwareMap.get(DcMotorImplEx.class, "leftSlide"));
+        rightSlide = new Motor(hardwareMap.get(DcMotorImplEx.class, "rightSlide"));
+        leftSlide.setDirection(DcMotorImplEx.Direction.REVERSE);
+//        rightSlide.setDirection(DcMotorImplEx.Direction.REVERSE);
+        leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftSlide.setHoldPosition(true);
+        rightSlide.setHoldPosition(true);
+        rotatingBase.setHoldPosition(true);
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();

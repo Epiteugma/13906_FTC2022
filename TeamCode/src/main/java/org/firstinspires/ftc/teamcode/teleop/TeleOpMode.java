@@ -32,7 +32,12 @@ public class TeleOpMode extends Common {
 
     private void run() {
         while (opModeIsActive()) {
-            driveTrain.driveRobotCentric(gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
+            leftSlide.setPower(gamepad2.left_stick_y);
+            rightSlide.setPower(gamepad2.left_stick_y);
+            rotatingBase.setPower(gamepad2.right_stick_y);
+            telemetry.addData("leftSlide", leftSlide.getCurrentPosition());
+            telemetry.addData("rightSlide", rightSlide.getCurrentPosition());
+//            driveTrain.driveRobotCentric(gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
             telemetry.update();
         }
     }
