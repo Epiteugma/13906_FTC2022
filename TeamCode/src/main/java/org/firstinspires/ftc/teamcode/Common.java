@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.z3db0y.flagship.DriveTrain;
 import com.z3db0y.flagship.Motor;
+import com.z3db0y.flagship.MotorGroup;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
@@ -21,7 +22,9 @@ public class Common extends LinearOpMode {
     public DriveTrain.MotorWithLocation backRight;
     public Motor leftSlide;
     public Motor rightSlide;
+    public MotorGroup slideMotors;
     public Motor rotatingBase;
+    public Motor extension;
     public Rev2mDistanceSensor leftDistance;
     public Rev2mDistanceSensor rightDistance;
     public Rev2mDistanceSensor backDistance;
@@ -29,6 +32,8 @@ public class Common extends LinearOpMode {
     public DriveTrain driveTrain;
     public BNO055IMU imu;
     public Servo cameraBase;
+    public Servo leftClaw;
+    public Servo rightClaw;
 
     @Override public void runOpMode() {}
 
@@ -86,10 +91,12 @@ public class Common extends LinearOpMode {
 
         driveTrain = new DriveTrain(DriveTrain.Type.MECANUM, new DriveTrain.MotorWithLocation[]{backLeft, backRight, frontLeft, frontRight}, wheelDiameter, gearRatio);
 
+        extension = new Motor(hardwareMap.get(DcMotorImplEx.class, "extension"));
         rotatingBase = new Motor(hardwareMap.get(DcMotorImplEx.class, "rotatingBase"));
         leftSlide = new Motor(hardwareMap.get(DcMotorImplEx.class, "leftSlide"));
         rightSlide = new Motor(hardwareMap.get(DcMotorImplEx.class, "rightSlide"));
-        leftSlide.setDirection(DcMotorImplEx.Direction.REVERSE);
+        slideMotors = new MotorGroup(leftSlide, rightSlide);
+//        leftSlide.setDirection(DcMotorImplEx.Direction.REVERSE);
 //        rightSlide.setDirection(DcMotorImplEx.Direction.REVERSE);
         leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -98,6 +105,7 @@ public class Common extends LinearOpMode {
         leftSlide.setHoldPosition(true);
         rightSlide.setHoldPosition(true);
         rotatingBase.setHoldPosition(true);
+        extension.setHoldPosition(true);
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -106,5 +114,7 @@ public class Common extends LinearOpMode {
         imu.initialize(parameters);
 
         cameraBase = hardwareMap.get(Servo.class, "cameraBase");
+        leftClaw = hardwareMap.get(Servo.class, "leftClaw");
+        rightClaw = hardwareMap.get(Servo.class, "rightClaw");
     }
 }

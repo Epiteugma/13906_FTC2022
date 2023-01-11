@@ -52,6 +52,27 @@ public class Motor extends DcMotorImplEx {
 		updateMotorState();
 	}
 
+	long lastStallCheck = 0;
+	int lastTicks = 0;
+	public boolean stalled(int maxTicksPerSec) {
+		if(lastStallCheck == 0) {
+			lastStallCheck = System.currentTimeMillis();
+			lastTicks = super.getCurrentPosition();
+			return false;
+		}
+		else {
+			long timeElapsed = System.currentTimeMillis() - lastStallCheck;
+			int maxElapsedTicks = (int) (maxTicksPerSec * this.getPower() * (int) timeElapsed / 1000);
+			int movedTicks = super.getCurrentPosition() - lastTicks;
+			double threshold = .5;
+			int minExpectedTicks = (int) (maxElapsedTicks * threshold);
+			lastStallCheck = System.currentTimeMillis();
+			lastTicks = super.getCurrentPosition();
+
+			return movedTicks < minExpectedTicks;
+		}
+	}
+
 	@Override
 	public void setMode(@NonNull RunMode runMode) {
 		this.runMode = runMode;

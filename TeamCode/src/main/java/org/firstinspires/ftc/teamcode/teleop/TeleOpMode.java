@@ -1,17 +1,7 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorImplEx;
-import com.z3db0y.flagship.DriveTrain;
-import com.z3db0y.flagship.DriveTrain.MotorWithLocation;
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Common;
 import org.firstinspires.ftc.teamcode.Enums;
-import org.firstinspires.ftc.teamcode.Flags;
 
 public class TeleOpMode extends Common {
 
@@ -37,7 +27,26 @@ public class TeleOpMode extends Common {
             rotatingBase.setPower(gamepad2.right_stick_y);
             telemetry.addData("leftSlide", leftSlide.getCurrentPosition());
             telemetry.addData("rightSlide", rightSlide.getCurrentPosition());
-//            driveTrain.driveRobotCentric(gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
+            driveTrain.driveRobotCentric(gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
+            slideMotors.setVelocity(gamepad2.left_stick_y);
+            extension.setPower(gamepad2.right_stick_y);
+            if(gamepad2.right_trigger > 0.4) {
+                leftClaw.setPosition(0.4);
+                rightClaw.setPosition(1);
+            }
+            else if(gamepad2.left_trigger > 0.4) {
+                leftClaw.setPosition(1);
+                rightClaw.setPosition(0.4);
+            }
+            if(gamepad2.dpad_right){
+                rotatingBase.setPower(1);
+            }
+            else if(gamepad2.dpad_left){
+                rotatingBase.setPower(-1);
+            }
+            else{
+                rotatingBase.setPower(0);
+            }
             telemetry.update();
         }
     }
