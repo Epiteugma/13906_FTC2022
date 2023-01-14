@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import android.util.Log;
+
 import org.firstinspires.ftc.teamcode.Common;
 import org.firstinspires.ftc.teamcode.Enums;
 
@@ -22,14 +24,19 @@ public class TeleOpMode extends Common {
 
     private void run() {
         while (opModeIsActive()) {
-            leftSlide.setPower(gamepad2.left_stick_y);
-            rightSlide.setPower(gamepad2.left_stick_y);
-            rotatingBase.setPower(gamepad2.right_stick_y);
             telemetry.addData("leftSlide", leftSlide.getCurrentPosition());
             telemetry.addData("rightSlide", rightSlide.getCurrentPosition());
             driveTrain.driveRobotCentric(gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
-            slideMotors.setVelocity(gamepad2.left_stick_y);
-            extension.setPower(gamepad2.right_stick_y);
+            double slideMass = 5;
+            slideMotors.setPower(gamepad2.left_stick_y > 0 ? gamepad2.left_stick_y - (9.84 * slideMass / 105) : gamepad2.left_stick_y);
+            Log.i("gamepadY", String.valueOf(gamepad2.left_stick_y));
+            if(Math.abs(gamepad2.right_stick_y) > Math.abs(gamepad2.right_stick_x)) {
+                extension.setPower(gamepad2.right_stick_y);
+                rotatingBase.setPower(0);
+            } else {
+                rotatingBase.setPower(gamepad2.right_stick_x);
+                extension.setPower(0);
+            }
             if(gamepad2.right_trigger > 0.4) {
                 leftClaw.setPosition(0.4);
                 rightClaw.setPosition(1);
@@ -37,15 +44,6 @@ public class TeleOpMode extends Common {
             else if(gamepad2.left_trigger > 0.4) {
                 leftClaw.setPosition(1);
                 rightClaw.setPosition(0.4);
-            }
-            if(gamepad2.dpad_right){
-                rotatingBase.setPower(1);
-            }
-            else if(gamepad2.dpad_left){
-                rotatingBase.setPower(-1);
-            }
-            else{
-                rotatingBase.setPower(0);
             }
             telemetry.update();
         }

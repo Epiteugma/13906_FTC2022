@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.z3db0y.flagship.DriveTrain;
 import com.z3db0y.flagship.Motor;
@@ -93,17 +94,18 @@ public class Common extends LinearOpMode {
 
         extension = new Motor(hardwareMap.get(DcMotorImplEx.class, "extension"));
         rotatingBase = new Motor(hardwareMap.get(DcMotorImplEx.class, "rotatingBase"));
+        rotatingBase.setDirection(DcMotorSimple.Direction.REVERSE);
         leftSlide = new Motor(hardwareMap.get(DcMotorImplEx.class, "leftSlide"));
         rightSlide = new Motor(hardwareMap.get(DcMotorImplEx.class, "rightSlide"));
         slideMotors = new MotorGroup(leftSlide, rightSlide);
+        slideMotors.setHoldPosition(true);
+        slideMotors.setDirection(DcMotorImplEx.Direction.REVERSE);
 //        leftSlide.setDirection(DcMotorImplEx.Direction.REVERSE);
 //        rightSlide.setDirection(DcMotorImplEx.Direction.REVERSE);
         leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftSlide.setHoldPosition(true);
-        rightSlide.setHoldPosition(true);
         rotatingBase.setHoldPosition(true);
         extension.setHoldPosition(true);
 

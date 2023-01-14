@@ -62,12 +62,6 @@ public class MotorGroup {
         }
     }
 
-    public void updateMotorState() {
-        for(Motor motor : motors) {
-            motor.updateMotorState();
-        }
-    }
-
     public void setDirection(DcMotor.Direction direction) {
         for(Motor motor : motors) {
             motor.setDirection(direction);

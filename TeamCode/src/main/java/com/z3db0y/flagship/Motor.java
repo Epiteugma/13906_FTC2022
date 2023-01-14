@@ -1,6 +1,8 @@
 package com.z3db0y.flagship;
 
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
@@ -23,7 +25,7 @@ public class Motor extends DcMotorImplEx {
 
 	// TODO: methods
 	void updateMotorState() {
-		if(this.holdPosition && this.power == 0 && this.velocity == 0) {
+		if(this.holdPosition && Math.abs(this.power) < 0.2 && Math.abs(this.velocity) < 20) {
 			if(!this.currentlyHoldingPosition) {
 				currentlyHoldingPosition = true;
 				super.setTargetPosition(super.getCurrentPosition());
