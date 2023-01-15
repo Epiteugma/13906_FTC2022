@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import android.util.Log;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Common;
 import org.firstinspires.ftc.teamcode.Enums;
 
@@ -28,14 +29,16 @@ public class TeleOpMode extends Common {
             telemetry.addData("rightSlide", rightSlide.getCurrentPosition());
             driveTrain.driveRobotCentric(gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
             double slideMass = 5;
-            slideMotors.setPower(gamepad2.left_stick_y > 0 ? gamepad2.left_stick_y - (9.84 * slideMass / 105) : gamepad2.left_stick_y);
+            slideMotors.setPower(gamepad2.left_stick_y > 0 ? gamepad2.left_stick_y - (9.81 * slideMass / 10500) : gamepad2.left_stick_y);
             Log.i("gamepadY", String.valueOf(gamepad2.left_stick_y));
+            boolean extensionAllowed = clawLimitSwitch.getDistance(DistanceUnit.CM) > 5;
+
             if(Math.abs(gamepad2.right_stick_y) > Math.abs(gamepad2.right_stick_x)) {
-                extension.setPower(gamepad2.right_stick_y);
+                if(extensionAllowed || gamepad2.right_stick_y < 0) extension.setPower(gamepad2.right_stick_y);
                 rotatingBase.setPower(0);
             } else {
                 rotatingBase.setPower(gamepad2.right_stick_x);
-                extension.setPower(0);
+                if(extensionAllowed) extension.setPower(0);
             }
             if(gamepad2.right_trigger > 0.4) {
                 leftClaw.setPosition(0.4);
@@ -44,6 +47,10 @@ public class TeleOpMode extends Common {
             else if(gamepad2.left_trigger > 0.4) {
                 leftClaw.setPosition(1);
                 rightClaw.setPosition(0.4);
+            }
+
+            if(!extensionAllowed) {
+                extension.setPower(-0.1);
             }
             telemetry.update();
         }

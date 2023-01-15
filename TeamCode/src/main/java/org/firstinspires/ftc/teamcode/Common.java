@@ -26,15 +26,12 @@ public class Common extends LinearOpMode {
     public MotorGroup slideMotors;
     public Motor rotatingBase;
     public Motor extension;
-    public Rev2mDistanceSensor leftDistance;
-    public Rev2mDistanceSensor rightDistance;
-    public Rev2mDistanceSensor backDistance;
-    public Rev2mDistanceSensor frontDistance;
     public DriveTrain driveTrain;
     public BNO055IMU imu;
     public Servo cameraBase;
     public Servo leftClaw;
     public Servo rightClaw;
+    public Rev2mDistanceSensor clawLimitSwitch;
 
     @Override public void runOpMode() {}
 
@@ -100,14 +97,14 @@ public class Common extends LinearOpMode {
         slideMotors = new MotorGroup(leftSlide, rightSlide);
         slideMotors.setHoldPosition(true);
         slideMotors.setDirection(DcMotorImplEx.Direction.REVERSE);
-//        leftSlide.setDirection(DcMotorImplEx.Direction.REVERSE);
-//        rightSlide.setDirection(DcMotorImplEx.Direction.REVERSE);
         leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rotatingBase.setHoldPosition(true);
         extension.setHoldPosition(true);
+
+        clawLimitSwitch = hardwareMap.get(Rev2mDistanceSensor.class, "clawLimitSwitch");
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
