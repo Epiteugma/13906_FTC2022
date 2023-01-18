@@ -79,6 +79,7 @@ public class Common extends LinearOpMode {
 
         frontLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
         backRight.setDirection(DcMotorImplEx.Direction.REVERSE);
+        frontRight.setDirection(DcMotorImplEx.Direction.REVERSE);
 
         for(DriveTrain.MotorWithLocation motor : new DriveTrain.MotorWithLocation[]{backLeft, backRight, frontLeft, frontRight}) {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -96,9 +97,10 @@ public class Common extends LinearOpMode {
         rightSlide = new Motor(hardwareMap.get(DcMotorImplEx.class, "rightSlide"));
         slideMotors = new MotorGroup(leftSlide, rightSlide);
         slideMotors.setHoldPosition(true);
-        slideMotors.setDirection(DcMotorImplEx.Direction.REVERSE);
         leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        rightSlide.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftSlide.setDirection(DcMotorSimple.Direction.REVERSE);
         leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rotatingBase.setHoldPosition(true);
