@@ -92,7 +92,6 @@ public class Common extends LinearOpMode {
 
         extension = new Motor(hardwareMap.get(DcMotorImplEx.class, "extension"));
         rotatingBase = new Motor(hardwareMap.get(DcMotorImplEx.class, "rotatingBase"));
-        rotatingBase.setDirection(DcMotorSimple.Direction.REVERSE);
         leftSlide = new Motor(hardwareMap.get(DcMotorImplEx.class, "leftSlide"));
         rightSlide = new Motor(hardwareMap.get(DcMotorImplEx.class, "rightSlide"));
         slideMotors = new MotorGroup(leftSlide, rightSlide);
