@@ -13,6 +13,7 @@ import com.z3db0y.flagship.Motor;
 import com.z3db0y.flagship.MotorGroup;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Common extends LinearOpMode {
     public Flags flags = this.getClass().isAnnotationPresent(Flags.class) ? this.getClass().getAnnotation(Flags.class) : null;
@@ -68,6 +69,16 @@ public class Common extends LinearOpMode {
         imu.initialize(parameters);
     }
 
+    private void openClaw(){
+        leftClaw.setPosition(1);
+        rightClaw.setPosition(0.4);
+    }
+
+    private void closeClaw(){
+        leftClaw.setPosition(0.4);
+        rightClaw.setPosition(1);
+    }
+
     public void initHDrive() {
         double gearRatio = 15.0;
         double wheelDiameter = 7.5;
@@ -102,6 +113,7 @@ public class Common extends LinearOpMode {
         leftSlide.setDirection(DcMotorSimple.Direction.REVERSE);
         leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rotatingBase.setDirection(DcMotorSimple.Direction.REVERSE);
         rotatingBase.setHoldPosition(true);
         extension.setHoldPosition(true);
 
@@ -116,5 +128,12 @@ public class Common extends LinearOpMode {
         cameraBase = hardwareMap.get(Servo.class, "cameraBase");
         leftClaw = hardwareMap.get(Servo.class, "leftClaw");
         rightClaw = hardwareMap.get(Servo.class, "rightClaw");
+
+        openClaw();
+        if(clawLimitSwitch.getDistance(DistanceUnit.CM) < 15){
+            extension.setTargetPosition(50);
+            extension.setPower(-1);
+            extension.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
     }
 }
