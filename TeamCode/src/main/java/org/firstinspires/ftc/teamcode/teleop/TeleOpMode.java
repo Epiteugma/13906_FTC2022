@@ -66,7 +66,7 @@ public class TeleOpMode extends Common {
                 rotatingBase.setPower(0);
             }
             else {
-                rotatingBase.setPower(gamepad2.right_stick_x);
+                rotatingBase.setPower(gamepad2.right_stick_x * 0.5);
                 if (extensionAllowed) extension.setPower(0);
             }
             if (gamepad2.right_trigger > 0.3) {

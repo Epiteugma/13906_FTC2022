@@ -130,10 +130,5 @@ public class Common extends LinearOpMode {
         rightClaw = hardwareMap.get(Servo.class, "rightClaw");
 
         openClaw();
-        if(clawLimitSwitch.getDistance(DistanceUnit.CM) < 15){
-            extension.setTargetPosition(50);
-            extension.setPower(-1);
-            extension.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }
     }
 }
