@@ -16,4 +16,9 @@ public class Enums {
         RIGHT,
         LEFT;
     }
+
+    public enum StartPosition {
+        LEFT,
+        RIGHT;
+    }
 }

@@ -1,4 +1,4 @@
-require('./prompt_polyfill');
+//require('./prompt_polyfill');
 const appContainer = document.getElementById('app');
 const { config } = require('./common');
 

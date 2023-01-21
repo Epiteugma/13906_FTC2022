@@ -85,9 +85,9 @@ public class AutonomousOpMode extends Common {
     }
 
     void initSleeveDetector() {
-        WebcamName easyOpenCvWebcam = hardwareMap.get(WebcamName.class, "easyOpenCvWebcam");
+        WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
         easyOpenCvViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        this.detector = new Detection(easyOpenCvWebcam, easyOpenCvViewId);
+        this.detector = new Detection(webcam, easyOpenCvViewId);
         this.detector.init(5.32, 1932, 1932, 648, 648);
         this.detector.waitForCamera();
     }
@@ -109,14 +109,14 @@ public class AutonomousOpMode extends Common {
 
     private void initCommon() {
         // Force stopper
-        Thread main = Thread.currentThread();
-        new Thread(() -> {
-            waitForStart();
-            while (!isStopRequested()) {}
-            try {
-                main.interrupt();
-            } catch (Exception ignored) {}
-        }).start();
+//        Thread main = Thread.currentThread();
+//        new Thread(() -> {
+//            waitForStart();
+//            while (!isStopRequested()) {}
+//            try {
+//                main.interrupt();
+//            } catch (Exception ignored) {}
+//        }).start();
 
         Logger.setTelemetry(new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()));
         initSleeveDetector();
@@ -181,76 +181,8 @@ public class AutonomousOpMode extends Common {
 
     public void pickUpCone(){}
 
-    public void driveToConeStack(){
-        // triangulate the path to the cone stack strafeCM turn to face the stack and drive to the stack
-        Logger.addData("Robot Location " + actualLocation[0] + " " + actualLocation[1] + " " + actualLocation[2]);
-        Logger.addData("Cone Stack Location " + coneStackLocation[0] + " " + coneStackLocation[1] + " " + coneStackLocation[2]);
-        Logger.update();
-        double yDistance = coneStackLocation[1] - actualLocation[1];
-        double xDistance = (coneStackLocation[0] - actualLocation[0]) - 5; // we want to go just in front of the stack
-        if (flags.side() == Enums.Side.RIGHT) {
-            driveTrain.turn(-90, 1, imu);
-            driveTrain.strafeCM(yDistance, 1, DriveTrain.Direction.LEFT);
-        }
-        else if (flags.side() == Enums.Side.LEFT) {
-            driveTrain.turn(90, 1, imu);
-            driveTrain.strafeCM(yDistance, 1, DriveTrain.Direction.RIGHT);
-        }
-        driveTrain.driveCM(xDistance, 1, DriveTrain.Direction.FORWARD);
-    }
-
     public void run() {
+        closeClaw();
         parkingPosition = sleeveDetection(3500);
-        initVuforia();
-        new Thread(() -> {
-            while (opModeIsActive()) {
-                vuforiaTracker.update();
-                if (vuforiaTracker.targetVisible()) {
-                    actualLocation = vuforiaTracker.getLocation();
-                }
-                else {
-                    while(!vuforiaTracker.targetVisible() && opModeIsActive()){
-                        Logger.addData("no visible, spinning servo");
-                        Logger.update();
-                        while(!vuforiaTracker.targetVisible() && opModeIsActive()) {
-                            vuforiaTracker.update();
-                            cameraBase.setPosition((Math.asin(2 * Math.PI * (cameraBase.getPosition()+0.01)) / Math.PI) % 0.5);
-                        }
-                    }
-                    Logger.addData("Stopped servo, target visible");
-                    Logger.update();
-                }
-            }
-        }).start();
-//        DriveTrain.CorrectionHandler correctionHandler = () -> {
-//            String caller = Thread.currentThread().getStackTrace()[2].getMethodName();
-//        };
-//        driveTrain.setCorrectionHandler(correctionHandler);
-//        if(flags.side() == Enums.Side.LEFT){
-////            cameraBase.setPosition(-90);
-//            if(flags.alliance() == Enums.Alliance.BLUE) {
-//                coneStackLocation = getConeStackLocation("blueUp");
-//            }
-//            else if(flags.alliance() == Enums.Alliance.RED) {
-//                coneStackLocation = getConeStackLocation("redDown");
-//            }
-//        }
-//        else if(flags.side() == Enums.Side.RIGHT){
-////            cameraBase.setPosition(90);
-//            if(flags.alliance() == Enums.Alliance.BLUE) {
-//                coneStackLocation = getConeStackLocation("blueDown");
-//            }
-//            else if(flags.alliance() == Enums.Alliance.RED) {
-//                coneStackLocation = getConeStackLocation("redUp");
-//            }
-//        }
-//        driveToConeStack();
-//        driveTrain.driveCM(50, 1, DriveTrain.Direction.FORWARD);
-//        driveTrain.turn(90, 1, imu);
-//        driveTrain.driveCM(50, 1, DriveTrain.Direction.FORWARD);
-//        driveTrain.turn(0, 1, imu);
-//        driveTrain.driveCM(50, 1, DriveTrain.Direction.FORWARD);
-//        driveTrain.turn(-90, 1, imu);
-//        park(parkingPosition);
     }
 }

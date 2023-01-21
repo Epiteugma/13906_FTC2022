@@ -306,13 +306,14 @@ public class DriveTrain {
             current = normalizeAngle(imu.getAngularOrientation().firstAngle);
             diff = normalizeAngle(target - current);
             double diffPercent = Math.abs(diff / startingDiff);
-            velocity = Range.clip(Math.abs(diffPercent * initialVelcity), 0.35, 1);
             Log.i("DriveTrain", "Current: " + current + " Target: " + target + " Diff: " + diff +  " diffPercent: " + diffPercent + "velocity: " + velocity);
             if(handler != null) handler.correct();
-            if (diff > 0) {
+            if (diff > 5 && Math.abs(velocity) > 0.1) {
+                velocity -= 0.09;
                 driveRobotCentric(0, velocity, 0);
             }
             else {
+                velocity += 0.09;
                 driveRobotCentric(0, -velocity, 0);
             }
         }

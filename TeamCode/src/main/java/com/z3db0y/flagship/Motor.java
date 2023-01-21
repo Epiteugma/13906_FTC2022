@@ -25,6 +25,9 @@ public class Motor extends DcMotorImplEx {
 
 	// TODO: methods
 	void updateMotorState() {
+		Log.i("RunMode", String.valueOf(this.runMode));
+		Log.i("Power", String.valueOf(this.power));
+		Log.i("Velocity", String.valueOf(this.velocity));
 		if(this.holdPosition && Math.abs(this.power) < 0.2 && Math.abs(this.velocity) < 20) {
 			if(!this.currentlyHoldingPosition) {
 				currentlyHoldingPosition = true;

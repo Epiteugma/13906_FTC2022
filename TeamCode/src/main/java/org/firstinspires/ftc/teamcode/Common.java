@@ -29,10 +29,10 @@ public class Common extends LinearOpMode {
     public Motor extension;
     public DriveTrain driveTrain;
     public BNO055IMU imu;
-    public Servo cameraBase;
     public Servo leftClaw;
     public Servo rightClaw;
     public Rev2mDistanceSensor clawLimitSwitch;
+    public Rev2mDistanceSensor slideDistance;
 
     @Override public void runOpMode() {}
 
@@ -69,12 +69,12 @@ public class Common extends LinearOpMode {
         imu.initialize(parameters);
     }
 
-    private void openClaw(){
+    public void openClaw(){
         leftClaw.setPosition(1);
         rightClaw.setPosition(0.4);
     }
 
-    private void closeClaw(){
+    public void closeClaw(){
         leftClaw.setPosition(0.4);
         rightClaw.setPosition(1);
     }
@@ -118,6 +118,7 @@ public class Common extends LinearOpMode {
         extension.setHoldPosition(true);
 
         clawLimitSwitch = hardwareMap.get(Rev2mDistanceSensor.class, "clawLimitSwitch");
+        slideDistance = hardwareMap.get(Rev2mDistanceSensor.class, "slideDistance");
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -125,10 +126,7 @@ public class Common extends LinearOpMode {
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         imu.initialize(parameters);
 
-        cameraBase = hardwareMap.get(Servo.class, "cameraBase");
         leftClaw = hardwareMap.get(Servo.class, "leftClaw");
         rightClaw = hardwareMap.get(Servo.class, "rightClaw");
-
-        openClaw();
     }
 }
