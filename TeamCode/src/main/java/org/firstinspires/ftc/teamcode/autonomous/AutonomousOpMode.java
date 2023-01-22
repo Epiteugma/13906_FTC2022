@@ -118,7 +118,7 @@ public class AutonomousOpMode extends Common {
         extension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         extension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        rotatingBaseHelper = new TicksToAngles(rotatingBase,  (int) (28 * 125 * 1.35));
+        rotatingBaseHelper = new TicksToAngles(rotatingBase,  (int) (28 * 125 * 1.75));
         // Force stopper
         Thread main = Thread.currentThread();
         new Thread(() -> {
