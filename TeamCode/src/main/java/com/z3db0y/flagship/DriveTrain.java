@@ -218,12 +218,12 @@ public class DriveTrain {
         int right = 0;
         switch (direction) {
             case FORWARD:
-                left = ticks;
-                right = ticks;
-                break;
-            case BACKWARD:
                 left = -ticks;
                 right = -ticks;
+                break;
+            case BACKWARD:
+                left = ticks;
+                right = ticks;
                 break;
         }
         runTicks(left, right, velocity);
@@ -236,53 +236,35 @@ public class DriveTrain {
         drive(ticks, velocity, direction);
     }
 
-   // Todo: keep the same heading
     public void strafe(int ticks, double velocity, Direction direction) {
-        switch (direction){
+        switch (direction) {
             case LEFT:
-                for (MotorWithLocation motor : this.motors) {
-                    switch (motor.location) {
-                        case FRONT_LEFT:
-                            motor.setRelativeTargetPosition(-ticks);
-                        case BACK_LEFT:
-                            motor.setRelativeTargetPosition(ticks);
-                            break;
-                        case FRONT_RIGHT:
-                            motor.setRelativeTargetPosition(ticks);
-                            break;
-                        case BACK_RIGHT:
-                            motor.setRelativeTargetPosition(-ticks);
-                            break;
-                    }
-                    motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * velocity);
-                }
+                motors[0].setRelativeTargetPosition(-ticks);
+                motors[1].setRelativeTargetPosition(ticks);
+                motors[2].setRelativeTargetPosition(ticks);
+                motors[3].setRelativeTargetPosition(-ticks);
                 break;
             case RIGHT:
-                for (MotorWithLocation motor : this.motors) {
-                    switch (motor.location) {
-                        case FRONT_LEFT:
-                            motor.setRelativeTargetPosition(ticks);
-                        case BACK_LEFT:
-                            motor.setRelativeTargetPosition(-ticks);
-                            break;
-                        case FRONT_RIGHT:
-                            motor.setRelativeTargetPosition(-ticks);
-                            break;
-                        case BACK_RIGHT:
-                            motor.setRelativeTargetPosition(ticks);
-                            break;
-                    }
-                    motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * velocity);
-                }
+                motors[0].setRelativeTargetPosition(ticks);
+                motors[1].setRelativeTargetPosition(-ticks);
+                motors[2].setRelativeTargetPosition(-ticks);
+                motors[3].setRelativeTargetPosition(ticks);
                 break;
+        }
+        for(MotorWithLocation motor : motors) {
+            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * velocity);
+        }
+        while(this.isBusy()) {}
+        for(MotorWithLocation motor : motors) {
+            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motor.setVelocity(0);
         }
     }
 
     public void strafeCM(double cm, double velocity, Direction direction) {
         int ticks = (int) (cm * (ticksPerRevolution / (wheelDiameter * Math.PI)) * gearRatio);
-        strafe(ticks, velocity, direction);
+        strafe(ticks / 16, velocity, direction);
     }
 
     public double normalizeAngle(double angle) {
@@ -296,28 +278,21 @@ public class DriveTrain {
     }
 
     public void turn(double target, double velocity, BNO055IMU imu) {
-        double padding = 1;
         double startAngle = imu.getAngularOrientation().firstAngle;
+        target = normalizeAngle(startAngle + target);
+        int direction = startAngle - target > 0 ? 1 : -1;
         double current = normalizeAngle(imu.getAngularOrientation().firstAngle);
-        double startingDiff = normalizeAngle(target - current);
-        double initialVelcity = velocity;
-        double diff = startingDiff;
-        while (Math.abs(diff) > padding) {
+        double error = normalizeAngle(target - current);
+        double turn = Math.abs(error)/180 * velocity * direction;
+        if(Math.abs(turn) < 0.1 * velocity) turn = 0.1 * velocity * direction;
+
+        while (Math.abs(turn) > 0.1 * velocity) {
             current = normalizeAngle(imu.getAngularOrientation().firstAngle);
-            diff = normalizeAngle(target - current);
-            double diffPercent = Math.abs(diff / startingDiff);
-            Log.i("DriveTrain", "Current: " + current + " Target: " + target + " Diff: " + diff +  " diffPercent: " + diffPercent + "velocity: " + velocity);
-            if(handler != null) handler.correct();
-            if (diff > 5 && Math.abs(velocity) > 0.1) {
-                velocity -= 0.09;
-                driveRobotCentric(0, velocity, 0);
-            }
-            else {
-                velocity += 0.09;
-                driveRobotCentric(0, -velocity, 0);
-            }
+            error = normalizeAngle(target - current);
+            turn = Math.abs(error)/45 * velocity * direction;
+            if(Math.abs(turn) < 0.1 * velocity) turn = 0.1 * velocity * direction;
+            driveRobotCentric(0, turn, 0);
         }
-        Log.i("DriveTrain", "Turned to " + target + " from " + startAngle + " current: " + current);
         driveRobotCentric(0, 0, 0);
     }
 

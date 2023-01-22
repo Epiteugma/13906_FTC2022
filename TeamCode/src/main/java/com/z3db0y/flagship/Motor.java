@@ -29,6 +29,7 @@ public class Motor extends DcMotorImplEx {
 		Log.i("Power", String.valueOf(this.power));
 		Log.i("Velocity", String.valueOf(this.velocity));
 		if(this.holdPosition && Math.abs(this.power) < 0.2 && Math.abs(this.velocity) < 20) {
+			if(this.runMode == RunMode.STOP_AND_RESET_ENCODER) super.setMode(RunMode.STOP_AND_RESET_ENCODER);
 			if(!this.currentlyHoldingPosition) {
 				currentlyHoldingPosition = true;
 				super.setTargetPosition(super.getCurrentPosition());
@@ -135,5 +136,26 @@ public class Motor extends DcMotorImplEx {
 	@Override
 	public int getTargetPosition() {
 		return this.targetPosition;
+	}
+
+	public void runToPosition(int ticks, double power) {
+		this.setRelativeTargetPosition(ticks);
+		this.setMode(RunMode.RUN_TO_POSITION);
+		this.setPower(power);
+		while (this.isBusy()) {
+			Log.i("Target", String.valueOf(this.getTargetPosition()));
+			Log.i("Current", String.valueOf(this.getCurrentPosition()));
+		}
+		this.setPower(0);
+	}
+
+	public void runToPositionAsync(int ticks, double power) {
+		this.setRelativeTargetPosition(ticks);
+		this.setMode(RunMode.RUN_TO_POSITION);
+		this.setPower(power);
+	}
+
+	public boolean atTargetPosition(){
+		return Math.abs(this.getCurrentPosition() - this.getTargetPosition()) < 10;
 	}
 }

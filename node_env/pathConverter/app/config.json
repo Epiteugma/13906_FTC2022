@@ -3,20 +3,7 @@
         "width": 366,
         "height": 366
     },
-    "path": [
-        {
-            "x": 31.093805309734513,
-            "y": 275.9575221238938
-        },
-        {
-            "x": 95.92436866789424,
-            "y": 275.9575221238938,
-            "type": "turn",
-            "direction": "forward",
-            "velocity": 1,
-            "comment": ""
-        }
-    ],
+    "path": [],
     "robotClassField": "driveTrain",
-    "invertTurn": true
+    "invertTurn": false
 }

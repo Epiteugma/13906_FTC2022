@@ -31,8 +31,7 @@ public class Common extends LinearOpMode {
     public BNO055IMU imu;
     public Servo leftClaw;
     public Servo rightClaw;
-    public Rev2mDistanceSensor clawLimitSwitch;
-    public Rev2mDistanceSensor slideDistance;
+    public Servo rotatingBaseServo;
 
     @Override public void runOpMode() {}
 
@@ -55,11 +54,6 @@ public class Common extends LinearOpMode {
 //        left.setDirection(DcMotorImplEx.Direction.REVERSE);
 //        front.setDirection(DcMotorImplEx.Direction.REVERSE);
 
-        frontRight.setHoldPosition(true);
-        frontLeft.setHoldPosition(true);
-        backRight.setHoldPosition(true);
-        backLeft.setHoldPosition(true);
-
         driveTrain = new DriveTrain(DriveTrain.Type.MECANUM, new DriveTrain.MotorWithLocation[]{frontLeft, backRight, frontRight, backLeft}, wheelDiameter, gearRatio);
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -70,13 +64,13 @@ public class Common extends LinearOpMode {
     }
 
     public void openClaw(){
-        leftClaw.setPosition(1);
+        leftClaw.setPosition(0.8);
         rightClaw.setPosition(0.4);
     }
 
     public void closeClaw(){
         leftClaw.setPosition(0.4);
-        rightClaw.setPosition(1);
+        rightClaw.setPosition(1.0);
     }
 
     public void initHDrive() {
@@ -96,7 +90,6 @@ public class Common extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             motor.getMotorType().setTicksPerRev(280 * 15);
-            motor.setHoldPosition(true);
         }
 
         driveTrain = new DriveTrain(DriveTrain.Type.MECANUM, new DriveTrain.MotorWithLocation[]{backLeft, backRight, frontLeft, frontRight}, wheelDiameter, gearRatio);
@@ -113,12 +106,8 @@ public class Common extends LinearOpMode {
         leftSlide.setDirection(DcMotorSimple.Direction.REVERSE);
         leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rotatingBase.setDirection(DcMotorSimple.Direction.REVERSE);
         rotatingBase.setHoldPosition(true);
         extension.setHoldPosition(true);
-
-        clawLimitSwitch = hardwareMap.get(Rev2mDistanceSensor.class, "clawLimitSwitch");
-        slideDistance = hardwareMap.get(Rev2mDistanceSensor.class, "slideDistance");
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -128,5 +117,6 @@ public class Common extends LinearOpMode {
 
         leftClaw = hardwareMap.get(Servo.class, "leftClaw");
         rightClaw = hardwareMap.get(Servo.class, "rightClaw");
+        rotatingBaseServo = hardwareMap.get(Servo.class, "rotatingBaseServo");
     }
 }

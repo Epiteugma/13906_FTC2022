@@ -73,4 +73,27 @@ public class MotorGroup {
             motor.setZeroPowerBehavior(behavior);
         }
     }
+
+    public void runToPosition(int position, double power) {
+        for(Motor motor : motors) motor.runToPositionAsync(position, power);
+        for (Motor motor : motors) {
+            while(!motor.atTargetPosition()) {}
+        }
+    }
+
+    public void runToPositionAsync(int position, double power) {
+        for(Motor motor : motors) {
+            motor.runToPositionAsync(position, power);
+        }
+    }
+
+    public int getTargetPosition() {
+        int st = 0;
+        int c = 0;
+        for(Motor motor : motors) {
+            st += motor.getTargetPosition();
+            c++;
+        }
+        return st/c;
+    }
 }

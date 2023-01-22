@@ -1,5 +1,5 @@
 {
-    "turn": "turn($angle, $velocity, 3, imu)",
+    "turn": "turn($angle, $velocity, imu)",
     "drive": {
         "forward": "driveCM($distance, $velocity, DriveTrain.Direction.FORWARD)",
         "backward": "driveCM($distance, $velocity, DriveTrain.Direction.BACKWARD)"

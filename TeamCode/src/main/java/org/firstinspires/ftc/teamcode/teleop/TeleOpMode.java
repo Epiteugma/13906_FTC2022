@@ -30,8 +30,7 @@ public class TeleOpMode extends Common {
     private void run() {
         Logger.setTelemetry(telemetry);
         double forwardMultiplier = 1;
-        boolean stopRotatingBaseTimer = false;
-        ElapsedTime rotatingBaseTimer = new ElapsedTime();
+        rotatingBaseServo.setPosition(1);
         while (opModeIsActive()) {
             if (gamepad1.left_bumper) forwardMultiplier = 0.45;
             if (gamepad1.right_bumper) forwardMultiplier = 1;
@@ -48,43 +47,23 @@ public class TeleOpMode extends Common {
             else {
                 slideMotors.setPower(0);
             }
-            boolean extensionAllowed = clawLimitSwitch.getDistance(DistanceUnit.CM) > 15;
 
             if (Math.abs(gamepad2.right_stick_y) > Math.abs(gamepad2.right_stick_x)) {
-                if (extensionAllowed || gamepad2.right_stick_y < 0) {
-                    extension.setPower(gamepad2.right_stick_y * 0.7);
-                }
+                extension.setPower(gamepad2.right_stick_y * 0.7);
                 rotatingBase.setPower(0);
             }
             else {
-                if(gamepad2.right_stick_x > 0.88) {
-                    // as time passes increase the power
-                    if(stopRotatingBaseTimer) {
-                        rotatingBaseTimer.reset();
-                        stopRotatingBaseTimer = false;
-                    }
-                    rotatingBase.setPower(rotatingBaseTimer.seconds() * 0.38);
-                }
-                else{
-                    stopRotatingBaseTimer = true;
-                    rotatingBase.setPower(gamepad2.right_stick_x * 0.5);
-                }
-                if (extensionAllowed) extension.setPower(0);
+                rotatingBase.setPower(gamepad2.right_stick_x * 0.38);
+                extension.setPower(0);
             }
+
             if (gamepad2.right_trigger > 0.3) {
                 closeClaw();
             }
             else if (gamepad2.left_trigger > 0.3) {
                 openClaw();
             }
-
-            if (!extensionAllowed) {
-                extension.setPower(0.15);
-            }
             Logger.addData("Info: ");
-            Logger.addData("clawLimitSwitch: " + clawLimitSwitch.getDistance(DistanceUnit.CM));
-            Logger.addData("slideDistance: " + slideDistance.getDistance(DistanceUnit.CM));
-            Logger.addData("rotatingBaseTimer: " + rotatingBaseTimer.seconds());
             Logger.addData("Powers: ");
             Logger.addData("rotatingBase: " + rotatingBase.getPower());
             Logger.addData("extension: " + extension.getPower());
