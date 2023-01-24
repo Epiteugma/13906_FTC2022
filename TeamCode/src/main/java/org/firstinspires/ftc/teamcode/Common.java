@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -14,6 +15,7 @@ import com.z3db0y.flagship.MotorGroup;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.autonomous.AutonomousOpMode;
 
 public class Common extends LinearOpMode {
     public Flags flags = this.getClass().isAnnotationPresent(Flags.class) ? this.getClass().getAnnotation(Flags.class) : null;
@@ -63,18 +65,51 @@ public class Common extends LinearOpMode {
         imu.initialize(parameters);
     }
 
-    public void openClaw(){
+    public void openClaw(boolean async){
         leftClaw.setPosition(0.8);
         rightClaw.setPosition(0.4);
+        if(!async) sleep(1200);
     }
 
-    public void closeClaw(){
+    public void openClaw() {
+        if(this.getClass().isAnnotationPresent(Autonomous.class)) openClaw(false);
+        else openClaw(true);
+    }
+
+    public void openClawPartially(boolean async) {
+        leftClaw.setPosition(0.6);
+        rightClaw.setPosition(0.6);
+        if(!async) sleep(1200);
+    }
+
+    public void openClawPartially() {
+        if(this.getClass().isAnnotationPresent(Autonomous.class)) openClawPartially(false);
+        else openClawPartially(true);
+    }
+
+    public void closeClaw(boolean async){
         leftClaw.setPosition(0.4);
         rightClaw.setPosition(1.0);
+        if(!async) sleep(1200);
+    }
+
+    public void closeClaw() {
+        if(this.getClass().isAnnotationPresent(Autonomous.class)) closeClaw(false);
+        else closeClaw(true);
+    }
+
+    public void releaseRotatingBaseServo(boolean async) {
+        rotatingBaseServo.setPosition(1);
+        if(!async) sleep(1000);
+    }
+
+    public void releaseRotatingBaseServo() {
+        if(this.getClass().isAnnotationPresent(Autonomous.class)) releaseRotatingBaseServo(false);
+        else releaseRotatingBaseServo(true);
     }
 
     public void initHDrive() {
-        double gearRatio = 15.0;
+        double gearRatio = 9.0;
         double wheelDiameter = 7.5;
 
         backLeft = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "backLeft"), DriveTrain.MotorWithLocation.Location.BACK_LEFT);
@@ -84,12 +119,11 @@ public class Common extends LinearOpMode {
 
         frontLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
         backRight.setDirection(DcMotorImplEx.Direction.REVERSE);
-        frontRight.setDirection(DcMotorImplEx.Direction.REVERSE);
+        backLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
 
         for(DriveTrain.MotorWithLocation motor : new DriveTrain.MotorWithLocation[]{backLeft, backRight, frontLeft, frontRight}) {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            motor.getMotorType().setTicksPerRev(280 * 15);
         }
 
         driveTrain = new DriveTrain(DriveTrain.Type.MECANUM, new DriveTrain.MotorWithLocation[]{backLeft, backRight, frontLeft, frontRight}, wheelDiameter, gearRatio);

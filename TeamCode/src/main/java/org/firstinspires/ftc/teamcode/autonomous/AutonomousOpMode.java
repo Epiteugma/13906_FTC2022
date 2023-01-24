@@ -118,7 +118,7 @@ public class AutonomousOpMode extends Common {
         extension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         extension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        rotatingBaseHelper = new TicksToAngles(rotatingBase,  (int) (28 * 125 * 1.75));
+        rotatingBaseHelper = new TicksToAngles(rotatingBase,  (int) (28 * 125 * 1.5));
         // Force stopper
         Thread main = Thread.currentThread();
         new Thread(() -> {
@@ -130,9 +130,8 @@ public class AutonomousOpMode extends Common {
             } catch (Exception ignored) {
             }
         }).start();
-//        rotatingBaseServo.setPosition(1);
-
         Logger.setTelemetry(new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()));
+        closeClaw(false);
         initSleeveDetector();
     }
 

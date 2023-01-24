@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.z3db0y.flagship.DriveTrain;
+import com.z3db0y.flagship.Motor;
 
 import org.firstinspires.ftc.teamcode.Enums;
 import org.firstinspires.ftc.teamcode.Flags;
@@ -13,9 +15,8 @@ public class Playground extends AutonomousOpMode {
 
     @Override
     public void run() {
-//        rotatingBaseHelper.runTo(-90, 1);
-//        sleep(3000);
-//        rotatingBaseHelper.runTo(90, 1);
+        waitForStart();
+        driveTrain.strafeCM(130, 1, DriveTrain.Direction.RIGHT);
         while(!Thread.currentThread().isInterrupted()) {}
     }
 

@@ -298,7 +298,9 @@ public class DriveTrain {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * velocity);
         }
-        while(this.isBusy()) {}
+        while(this.isBusy()) {
+
+        }
         for(MotorWithLocation motor : motors) {
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             motor.setVelocity(0);
@@ -306,9 +308,9 @@ public class DriveTrain {
     }
 
     public void strafeCM(double cm, double velocity, Direction direction) {
-        int ticks = (int) (cm * (ticksPerRevolution / (wheelDiameter * Math.PI)) * gearRatio);
+        int ticks = (int) (cm / (Math.PI * wheelDiameter) * ticksPerRevolution);
         Logger.addData("DriveTrain", "Strafing " + cm + " cm at " + velocity + " velocity");
-        strafe(ticks / 16, velocity, direction);
+        strafe(ticks, velocity, direction);
     }
 
     public double normalizeAngle(double angle) {
