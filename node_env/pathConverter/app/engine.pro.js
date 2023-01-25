@@ -4,6 +4,14 @@ const { config } = require('./common');
 
 alert = (msg) => { require('electron').remote.dialog.showMessageBoxSync(null, { message: msg, title: document.title }) };
 
+let animateQueued = false;
+let currentlyAnimating = false;
+let anim = {
+    step: 1,
+    i: 0,
+    path: []
+};
+
 let keysdown = [];
 let pathstarted = false;
 document.addEventListener('keydown', (event) => {
@@ -41,6 +49,7 @@ addPathControls();
 addObstaclesControls();
 addFieldControls();
 addExportControls();
+addAnimControls();
 appContainer.appendChild(presetTitle);
 appContainer.appendChild(presetContainer);
 appContainer.appendChild(controlsTitle);
@@ -83,7 +92,6 @@ function addPresets(quantity) {
         saveButton.style.fontFamily = 'Material Symbols Outlined';
         saveButton.addEventListener('click', () => {
             // Todo
-            prompt('Test');
         });
         saveButton.style.marginRight = '3px';
         presetButtonContainer.appendChild(saveButton);
@@ -125,7 +133,6 @@ function findClosest45DdegreePoint(point, anchor) {
 
 let mouse = { x: 0, y: 0 };
 function draw() {
-    requestAnimationFrame(draw);
     if(document.getElementById('customContextMenu')) return;
     let path = config.get('path');
     context.clearRect(-0.5, -0.5, canvas.width, canvas.height);
@@ -150,6 +157,14 @@ function draw() {
         context.stroke();
         context.closePath();
         context.strokeStyle = strokeStyle;
+    }
+    if(animateQueued) {
+        animateQueued = false;
+        currentlyAnimating = true;
+        anim.path
+    }
+    if(currentlyAnimating) {
+
     }
 }
 draw();
@@ -395,6 +410,7 @@ function addExportControls() {
     invertTurnC.appendChild(invertTurnSwitch);
 
     let exportBtnC = document.createElement('div');
+    exportBtnC.innerHTML = '========================================';
     exportBtnC.className = 'control';
     let exportBtn = document.createElement('button');
     exportBtn.innerText = 'Export';
@@ -457,6 +473,74 @@ function addPathControls() {
     cont.appendChild(resetP);
     pathC.appendChild(cont);
     controls.appendChild(pathC);
+}
+
+function addAnimControls() {
+    let imageC = document.createElement('div');
+    imageC.className = 'control';
+    imageC.innerText = 'Robot Image';
+    let cont = document.createElement('div');
+    let input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.innerText = 'Select';
+    cont.appendChild(input);
+    imageC.appendChild(cont);
+
+    let dimensionsC = document.createElement('div');
+    dimensionsC.className = 'control';
+    dimensionsC.innerText = 'Robot Dimensions';
+    let cont2 = document.createElement('div');
+    let width = document.createElement('input');
+    width.type = 'number';
+    width.value = config.get('robot.width');
+    width.style.marginRight = '2px';
+    width.addEventListener('change', () => {
+        config.set('robot.width', width.value);
+    });
+    let height = document.createElement('input');
+    height.type = 'number';
+    height.value = config.get('robot.height');
+    height.addEventListener('change', () => {
+        config.set('robot.height', height.value);
+    });
+    cont2.appendChild(width);
+    cont2.appendChild(height);
+    dimensionsC.appendChild(cont2);
+
+    let animC = document.createElement('div');
+    animC.className = 'control';
+    animC.innerHTML = '========================================';
+    let cont3 = document.createElement('div');
+    let animBtn = document.createElement('button');
+    animBtn.innerText = 'Animate';
+    animBtn.style.marginRight = '2px';
+    animBtn.addEventListener('click', () => animateRobot());
+    cont3.appendChild(animBtn);
+    let hideRobotBtn = document.createElement('button');
+    hideRobotBtn.innerText = 'Hide Robot';
+    hideRobotBtn.addEventListener('click', () => hideRobot());
+    cont3.appendChild(hideRobotBtn);
+    animC.appendChild(cont3);
+
+    controls.appendChild(imageC);
+    controls.appendChild(dimensionsC);
+    controls.appendChild(animC);
+}
+
+function animateRobot() {
+    let path = config.get('path', []);
+    if(!path.length) return alert('No path to animate!');
+    if(pathstarted) return alert('Finish path to animate!');
+    window.scrollTo({
+        top: canvas.clientTop
+    });
+    
+    animateQueued = true;
+}
+
+function hideRobot() {
+
 }
 
 function showObstaclePopup() {
