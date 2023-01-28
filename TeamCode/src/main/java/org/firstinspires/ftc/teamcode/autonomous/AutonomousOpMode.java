@@ -49,30 +49,8 @@ public class AutonomousOpMode extends Common {
     public ArrayList<AprilTagDetection> detections;
     public ParkingPosition parkingPosition = defaultParkingPosition;
     public TicksToAngles rotatingBaseHelper;
-    private String readFile(String path) {
-        try {
-            InputStream is = hardwareMap.appContext.getAssets().open(path);
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            return new String(buffer, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
     public void runOpMode() {
-        try {
-            map = (JSONObject) new JSONTokener(readFile("map.json")).nextValue();
-            Logger.addData("Map" + map.toString());
-            Logger.update();
-        } catch (JSONException e) {
-            Logger.addData("Map" + e.getMessage());
-            Logger.update();
-            e.printStackTrace();
-        }
         if (flags != null) {
 
             if (flags.robotType() == Enums.RobotType.X_DRIVE) this.initBoxDrive();
@@ -121,7 +99,7 @@ public class AutonomousOpMode extends Common {
         rotatingBaseHelper = new TicksToAngles(rotatingBase,  (int) (28 * 125 * 1.5));
         // Force stopper
         Thread main = Thread.currentThread();
-        new Thread(() -> {
+        Thread terminator = new Thread(() -> {
             while(opModeInInit()) if(isStopRequested()) main.interrupt();
             while (!isStopRequested()) {
             }
@@ -129,7 +107,9 @@ public class AutonomousOpMode extends Common {
                 main.interrupt();
             } catch (Exception ignored) {
             }
-        }).start();
+        });
+        terminator.setName("THE TERMINATOR");
+        terminator.start();
         Logger.setTelemetry(new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()));
         closeClaw(false);
         initSleeveDetector();

@@ -19,12 +19,18 @@ public class Logger {
     }
 
     static private String stripHTML(Object str) {
-        return str.toString()
-                .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;")
-                .replaceAll(" ", "&nbsp;")
-                .replaceAll("\"", "&quot;")
-                .replaceAll("'", "&apos;");
+        String stri = str.toString();
+        StringBuilder b = new StringBuilder();
+        for(int i = 0; i < stri.length(); i++) {
+            char c = stri.charAt(i);
+            if(c == '<') b.append("&lt;");
+            else if(c == '>') b.append("&gt;");
+            else if(c == ' ') b.append("&nbsp;");
+            else if(c == '"') b.append("&quot;");
+            else if(c == '\'') b.append("&apos;");
+            else b.append(c);
+        }
+        return b.toString();
     }
 
     static private void addDataInternal(Object message, String color, String caller) {

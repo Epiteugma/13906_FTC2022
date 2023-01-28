@@ -15,9 +15,8 @@ public class Playground extends AutonomousOpMode {
 
     @Override
     public void run() {
-        waitForStart();
-        driveTrain.strafeCM(130, 1, DriveTrain.Direction.RIGHT);
-        while(!Thread.currentThread().isInterrupted()) {}
+        openClaw(true);
+        driveTrain.strafeCM(100, 1, DriveTrain.Direction.RIGHT);
     }
 
 }
