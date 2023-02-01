@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import org.firstinspires.ftc.teamcode.autonomous.vision.vuforia.VuforiaTracker;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class DriveTrain {
@@ -18,14 +19,6 @@ public class DriveTrain {
     double ticksPerRevolution;
     double wheelDiameter;
     double gearRatio;
-    CorrectionHandler handler;
-    public interface CorrectionHandler {
-        void correct();
-    }
-
-    public void setCorrectionHandler(CorrectionHandler handler) {
-        this.handler = handler;
-    }
 
     public enum Direction {
         FORWARD,
@@ -104,6 +97,7 @@ public class DriveTrain {
 
     public void runTicks(int left, int right, double velocity) {
         for (MotorWithLocation motor : this.motors) {
+            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             switch (motor.location) {
                 case LEFT:
                 case BACK_LEFT:
@@ -116,18 +110,11 @@ public class DriveTrain {
                     motor.setRelativeTargetPosition(right);
                     break;
             }
-            Logger.addData("Setting motor " + motor.location + " ticks to " + motor.getTargetPosition());
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * velocity);
         }
-        Logger.update();
-        while(this.isBusy()){
-            if(handler != null) handler.correct();
-            for (MotorWithLocation motor : this.motors) {
-                Logger.addData("Motor " + motor.location + " is at " + motor.getCurrentPosition() + " ticks");
-                Logger.update();
-            }
-        }
+        for(Motor motor : motors) motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * velocity);
+        while(this.isBusy()) {}
+        for(Motor motor : motors) motor.setVelocity(0);
     }
 
     public void setVelocity(double fr, double fl, double br, double bl) {
@@ -146,9 +133,9 @@ public class DriveTrain {
                     motor.setVelocity(bl);
                     break;
             }
-            Logger.addData("Setting motor " + motor.location + " velocity to " + motor.getVelocity());
+//            Logger.addData("Setting motor " + motor.location + " velocity to " + motor.getVelocity());
         }
-        Logger.update();
+//        Logger.update();
     }
 
     public void setPower(double fr, double fl, double br, double bl) {
@@ -167,21 +154,20 @@ public class DriveTrain {
                     motor.setPower(bl);
                     break;
             }
-            Logger.addData("Setting motor power of " + motor.location + " to " + motor.getPower());
+//            Logger.addData("Setting motor power of " + motor.location + " to " + motor.getPower());
         }
-        Logger.update();
+//        Logger.update();
     }
 
     public boolean isBusy() {
-        for (MotorWithLocation motor : this.motors) {
-            if (motor.isBusy()) {
-                int ticks = motor.getCurrentPosition();
-                Logger.addData("DriveTrain", "Motor " + motor.location + " is busy at " + ticks + " ticks");
-                return true;
-            }
+        int tickSum = 0;
+        int targetTickSum = 0;
+        int allowedError = 3;
+        for (int i = 0; i < motors.length; i++) {
+            tickSum += Math.abs(motors[i].getCurrentPosition());
+            targetTickSum += Math.abs(motors[i].getTargetPosition());
         }
-        Logger.update();
-        return false;
+        return Math.abs((tickSum/this.motors.length) - (targetTickSum/this.motors.length)) > allowedError;
     }
 
     public void driveVuforia(double distance, double robotAngle, double velocity, VuforiaTracker vuforia) {
@@ -247,9 +233,9 @@ public class DriveTrain {
             }
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * resultantVelo);
-            Logger.addData("Setting motor velocity" + motor.location + " to " + motor.getVelocity());
+//            Logger.addData("Setting motor velocity" + motor.location + " to " + motor.getVelocity());
         }
-        Logger.update();
+//        Logger.update();
     }
 
     // KEEP THE SAME HEADING ANGLE
@@ -271,15 +257,16 @@ public class DriveTrain {
 
     public void driveCM(double cm, double velocity, Direction direction) {
         double wheelCirc = Math.PI * wheelDiameter;
-        int ticks = (int) (cm / wheelCirc * ticksPerRevolution);
-        Logger.addData("DriveTrain", "Driving " + cm + " cm at " + velocity + " velocity");
-        Logger.update();
+        int ticks = (int) ((cm / wheelCirc) * ticksPerRevolution);
+//        Logger.addData("DriveTrain", "Driving " + cm + " cm at " + velocity + " velocity");
+//        Logger.update();
         drive(ticks, velocity, direction);
-        Logger.addData("DriveTrain", "Done driving " + cm + " cm at " + velocity + " velocity");
-        Logger.update();
+//        Logger.addData("DriveTrain", "Done driving " + cm + " cm at " + velocity + " velocity");
+//        Logger.update();
     }
 
     public void strafe(int ticks, double velocity, Direction direction) {
+        for(Motor motor : motors) motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         switch (direction) {
             case LEFT:
                 motors[0].setRelativeTargetPosition(-ticks);
@@ -294,17 +281,10 @@ public class DriveTrain {
                 motors[3].setRelativeTargetPosition(ticks);
                 break;
         }
-        for(MotorWithLocation motor : motors) {
-            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * velocity);
-        }
-        while(this.isBusy()) {
-
-        }
-        for(MotorWithLocation motor : motors) {
-            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            motor.setVelocity(0);
-        }
+        for(Motor motor : motors) motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        for(Motor motor : motors) motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * velocity);
+        while(this.isBusy()) {}
+        for(Motor motor : motors) motor.setVelocity(0);
     }
 
     public void strafeCM(double cm, double velocity, Direction direction) {
@@ -323,10 +303,10 @@ public class DriveTrain {
         return angle;
     }
 
-    public void turn(double target, double velocity, BNO055IMU imu) {
+    public void turn(double target, double velocity, BNO055IMU imu, boolean relative) {
         double startAngle = imu.getAngularOrientation().firstAngle;
-        target = normalizeAngle(startAngle + target);
-        int direction = startAngle - target > 0 ? 1 : -1;
+        target = normalizeAngle((relative ? startAngle : 0) + target);
+        int direction = normalizeAngle(startAngle - target) > 0 ? 1 : -1;
         double current = normalizeAngle(imu.getAngularOrientation().firstAngle);
         double error = normalizeAngle(target - current);
         double turnVelo = Math.abs(error)/180 * velocity * direction;
@@ -338,15 +318,19 @@ public class DriveTrain {
             turnVelo = Math.abs(error)/45 * velocity * direction;
             if(Math.abs(turnVelo) < 0.1 * velocity) turnVelo = 0.1 * velocity * direction;
             driveRobotCentric(0, turnVelo, 0);
-            Logger.addData("DriveTrain", "Turning to " + target + " at " + velocity + " velocity");
-            Logger.addData("DriveTrain", "Current angle: " + current);
-            Logger.addData("DriveTrain", "Error: " + error);
-            Logger.addData("DriveTrain", "Turn: " + turnVelo);
-            Logger.update();
+//            Logger.addData("DriveTrain", "Turning to " + target + " at " + velocity + " velocity");
+//            Logger.addData("DriveTrain", "Current angle: " + current);
+//            Logger.addData("DriveTrain", "Error: " + error);
+//            Logger.addData("DriveTrain", "Turn: " + turnVelo);
+//            Logger.update();
         }
         driveRobotCentric(0, 0, 0);
-        Logger.addData("DriveTrain", "Turned to " + target + " at " + velocity + " velocity");
-        Logger.update();
+//        Logger.addData("DriveTrain", "Turned to " + target + " at " + velocity + " velocity");
+//        Logger.update();
+    }
+
+    public void turn(double target, double velocity, BNO055IMU imu) {
+        this.turn(target, velocity, imu, true);
     }
 
     // TODO: maybe add a drive field centric method

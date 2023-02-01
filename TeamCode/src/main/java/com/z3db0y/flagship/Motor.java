@@ -138,21 +138,28 @@ public class Motor extends DcMotorImplEx {
 		return this.targetPosition;
 	}
 
-	public void runToPosition(int ticks, double power) {
-		this.setRelativeTargetPosition(ticks);
+	public void runToPosition(int ticks, double power, boolean relative) {
+		if(relative) this.setRelativeTargetPosition(ticks);
+		else this.setTargetPosition(ticks);
 		this.setMode(RunMode.RUN_TO_POSITION);
 		this.setPower(power);
-		while (this.isBusy()) {
-			Log.i("Target", String.valueOf(this.getTargetPosition()));
-			Log.i("Current", String.valueOf(this.getCurrentPosition()));
-		}
+		while (this.isBusy()) {}
 		this.setPower(0);
 	}
 
-	public void runToPositionAsync(int ticks, double power) {
-		this.setRelativeTargetPosition(ticks);
+	public void runToPosition(int ticks, double power) {
+		this.runToPosition(ticks, power, true);
+	}
+
+	public void runToPositionAsync(int ticks, double power, boolean relative) {
+		if(relative) this.setRelativeTargetPosition(ticks);
+		else this.setTargetPosition(ticks);
 		this.setMode(RunMode.RUN_TO_POSITION);
 		this.setPower(power);
+	}
+
+	public void runToPositionAsync(int ticks, double power) {
+		this.runToPositionAsync(ticks, power, true);
 	}
 
 	public boolean atTargetPosition(){

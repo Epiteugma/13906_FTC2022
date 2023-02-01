@@ -35,7 +35,7 @@ public class TeleOpMode extends Common {
             if (gamepad1.left_bumper) forwardMultiplier = 0.45;
             if (gamepad1.right_bumper) forwardMultiplier = 1;
             driveTrain.driveRobotCentric(gamepad1.left_stick_y * forwardMultiplier, gamepad1.right_stick_x, gamepad1.left_stick_x);
-            double downMultiplier = 0.25;
+            double downMultiplier = 0.4;
             if (gamepad2.left_stick_y < 0) {
                 // UP
                 slideMotors.setPower(-gamepad2.left_stick_y);
@@ -48,14 +48,16 @@ public class TeleOpMode extends Common {
                 slideMotors.setPower(0);
             }
 
-            if (Math.abs(gamepad2.right_stick_y) > Math.abs(gamepad2.right_stick_x)) {
-                extension.setPower(gamepad2.right_stick_y * 0.7);
-                rotatingBase.setPower(0);
-            }
-            else {
-                rotatingBase.setPower(gamepad2.right_stick_x * 0.38);
-                extension.setPower(0);
-            }
+//            if (Math.abs(gamepad2.right_stick_y) > Math.abs(gamepad2.right_stick_x)) {
+//                extension.setPower(gamepad2.right_stick_y * 0.7);
+//                rotatingBase.setPower(0);
+//            }
+//            else {
+//                rotatingBase.setPower(gamepad2.right_stick_x * 0.6);
+//                extension.setPower(0);
+//            }
+            extension.setPower(gamepad2.right_stick_y * 0.7);
+            rotatingBase.setPower(gamepad1.left_trigger > gamepad1.right_trigger ? -1 * (gamepad1.left_trigger < 0.65 ? gamepad1.left_trigger * 0.5 : gamepad1.left_trigger) : (gamepad1.right_trigger < 0.65 ? gamepad1.right_trigger * 0.5 : gamepad1.right_trigger));
 
             if (gamepad2.right_trigger > 0.3) {
                 closeClaw();
@@ -63,17 +65,17 @@ public class TeleOpMode extends Common {
             else if (gamepad2.left_trigger > 0.3) {
                 openClaw();
             }
-            Logger.addData("Info: ");
-            Logger.addData("Powers: ");
-            Logger.addData("rotatingBase: " + rotatingBase.getPower());
-            Logger.addData("extension: " + extension.getPower());
-            Logger.addData("slideMotors: " + leftSlide.getPower());
-            Logger.addData("Ticks: ");
-            Logger.addData("leftSlide: " + leftSlide.getCurrentPosition());
-            Logger.addData("rightSlide: " + rightSlide.getCurrentPosition());
-            Logger.addData("extension: " + extension.getCurrentPosition());
-            Logger.addData("rotatingBase: " + rotatingBase.getCurrentPosition());
-            Logger.update();
+//            Logger.addData("Info: ");
+//            Logger.addData("Powers: ");
+//            Logger.addData("rotatingBase: " + rotatingBase.getPower());
+//            Logger.addData("extension: " + extension.getPower());
+//            Logger.addData("slideMotors: " + leftSlide.getPower());
+//            Logger.addData("Ticks: ");
+//            Logger.addData("leftSlide: " + leftSlide.getCurrentPosition());
+//            Logger.addData("rightSlide: " + rightSlide.getCurrentPosition());
+//            Logger.addData("extension: " + extension.getCurrentPosition());
+//            Logger.addData("rotatingBase: " + rotatingBase.getCurrentPosition());
+//            Logger.update();
         }
     }
 }

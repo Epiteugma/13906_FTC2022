@@ -35,6 +35,9 @@ public class Common extends LinearOpMode {
     public Servo rightClaw;
     public Servo rotatingBaseServo;
 
+    public static double slideGearRadius = 4.75/2;
+    public static double extensionGearRadius = 4.75/2;
+
     @Override public void runOpMode() {}
 
     public void initBoxDrive() {
@@ -66,8 +69,8 @@ public class Common extends LinearOpMode {
     }
 
     public void openClaw(boolean async){
-        leftClaw.setPosition(0.8);
-        rightClaw.setPosition(0.4);
+        leftClaw.setPosition(0.65);
+        rightClaw.setPosition(0.65);
         if(!async) sleep(1200);
     }
 
@@ -75,21 +78,21 @@ public class Common extends LinearOpMode {
         if(this.getClass().isAnnotationPresent(Autonomous.class)) openClaw(false);
         else openClaw(true);
     }
-
-    public void openClawPartially(boolean async) {
-        leftClaw.setPosition(0.6);
-        rightClaw.setPosition(0.6);
-        if(!async) sleep(1200);
-    }
-
-    public void openClawPartially() {
-        if(this.getClass().isAnnotationPresent(Autonomous.class)) openClawPartially(false);
-        else openClawPartially(true);
-    }
+//
+//    public void openClawPartially(boolean async) {
+//        leftClaw.setPosition(0.6);
+//        rightClaw.setPosition(0.6);
+//        if(!async) sleep(1200);
+//    }
+//
+//    public void openClawPartially() {
+//        if(this.getClass().isAnnotationPresent(Autonomous.class)) openClawPartially(false);
+//        else openClawPartially(true);
+//    }
 
     public void closeClaw(boolean async){
-        leftClaw.setPosition(0.4);
-        rightClaw.setPosition(1.0);
+        leftClaw.setPosition(0.94);
+        rightClaw.setPosition(0.94);
         if(!async) sleep(1200);
     }
 
@@ -106,6 +109,11 @@ public class Common extends LinearOpMode {
     public void releaseRotatingBaseServo() {
         if(this.getClass().isAnnotationPresent(Autonomous.class)) releaseRotatingBaseServo(false);
         else releaseRotatingBaseServo(true);
+    }
+
+    public void encloseClaw(){
+        leftClaw.setPosition(0.5);
+        rightClaw.setPosition(0.5);
     }
 
     public void initHDrive() {
@@ -151,6 +159,7 @@ public class Common extends LinearOpMode {
 
         leftClaw = hardwareMap.get(Servo.class, "leftClaw");
         rightClaw = hardwareMap.get(Servo.class, "rightClaw");
+        leftClaw.setDirection(Servo.Direction.REVERSE);
         rotatingBaseServo = hardwareMap.get(Servo.class, "rotatingBaseServo");
     }
 }

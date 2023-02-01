@@ -74,17 +74,25 @@ public class MotorGroup {
         }
     }
 
-    public void runToPosition(int position, double power) {
-        for(Motor motor : motors) motor.runToPositionAsync(position, power);
+    public void runToPosition(int position, double power, boolean relative) {
+        for(Motor motor : motors) motor.runToPositionAsync(position, power, relative);
         for (Motor motor : motors) {
             while(!motor.atTargetPosition()) {}
         }
     }
 
-    public void runToPositionAsync(int position, double power) {
+    public void runToPosition(int position, double power) {
+        this.runToPosition(position, power, true);
+    }
+
+    public void runToPositionAsync(int position, double power, boolean relative) {
         for(Motor motor : motors) {
-            motor.runToPositionAsync(position, power);
+            motor.runToPositionAsync(position, power, relative);
         }
+    }
+
+    public void runToPositionAsync(int position, double power) {
+        this.runToPositionAsync(position, power, true);
     }
 
     public int getTargetPosition() {
