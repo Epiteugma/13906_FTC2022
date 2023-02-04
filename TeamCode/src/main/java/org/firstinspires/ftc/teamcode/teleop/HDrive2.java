@@ -5,6 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Enums;
 import org.firstinspires.ftc.teamcode.Flags;
 
-@TeleOp(name="BoxDrive", group="FTC22")
-@Flags(robotType = Enums.RobotType.BOX_DRIVE)
-public class BoxDrive extends TeleOpMode {}
+@TeleOp(name="HDrive2", group="FTC22")
+@Flags(robotType = Enums.RobotType.H_DRIVE2)
+public class HDrive2 extends TeleOpMode {}

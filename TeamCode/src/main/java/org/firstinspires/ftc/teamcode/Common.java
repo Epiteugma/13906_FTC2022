@@ -40,8 +40,8 @@ public class Common extends LinearOpMode {
 
     @Override public void runOpMode() {}
 
-    public void initBoxDrive() {
-        double gearRatio = 15.0;
+    public void initHDrive2() {
+        double gearRatio = 5 * 3;
         double wheelDiameter = 9;
 
         backLeft = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "backLeft"), DriveTrain.MotorWithLocation.Location.BACK_LEFT);
@@ -49,23 +49,28 @@ public class Common extends LinearOpMode {
         frontLeft = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "frontLeft"), DriveTrain.MotorWithLocation.Location.FRONT_LEFT);
         frontRight = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "frontRight"), DriveTrain.MotorWithLocation.Location.FRONT_RIGHT);
 
-//        leftDistance = hardwareMap.get(Rev2mDistanceSensor.class, "leftDistance");
-//        rightDistance = hardwareMap.get(Rev2mDistanceSensor.class, "rightDistance");
-//        backDistance = hardwareMap.get(Rev2mDistanceSensor.class, "backDistance");
-//        frontDistance = hardwareMap.get(Rev2mDistanceSensor.class, "frontDistance");
-
-        frontRight.setDirection(DcMotorImplEx.Direction.REVERSE);
+        frontLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
         backLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
-//        left.setDirection(DcMotorImplEx.Direction.REVERSE);
-//        front.setDirection(DcMotorImplEx.Direction.REVERSE);
 
         driveTrain = new DriveTrain(DriveTrain.Type.MECANUM, new DriveTrain.MotorWithLocation[]{frontLeft, backRight, frontRight, backLeft}, wheelDiameter, gearRatio);
+
+        leftSlide = new Motor(hardwareMap.get(DcMotorImplEx.class, "leftSlide"));
+        rightSlide = new Motor(hardwareMap.get(DcMotorImplEx.class, "rightSlide"));
+        slideMotors = new MotorGroup(leftSlide, rightSlide);
+        slideMotors.setHoldPosition(true);
+        leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        imu.initialize(parameters);
+
+        leftClaw = hardwareMap.get(Servo.class, "leftClaw");
+        rightClaw = hardwareMap.get(Servo.class, "rightClaw");
+        leftClaw.setDirection(Servo.Direction.REVERSE);
     }
 
     public void openClaw(boolean async){
@@ -138,6 +143,7 @@ public class Common extends LinearOpMode {
 
         extension = new Motor(hardwareMap.get(DcMotorImplEx.class, "extension"));
         rotatingBase = new Motor(hardwareMap.get(DcMotorImplEx.class, "rotatingBase"));
+        rotatingBase.setDirection(DcMotorSimple.Direction.REVERSE);
         leftSlide = new Motor(hardwareMap.get(DcMotorImplEx.class, "leftSlide"));
         rightSlide = new Motor(hardwareMap.get(DcMotorImplEx.class, "rightSlide"));
         slideMotors = new MotorGroup(leftSlide, rightSlide);

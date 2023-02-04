@@ -15,7 +15,7 @@ public class TeleOpMode extends Common {
     @Override
     public void runOpMode() {
         if (flags != null) {
-            if (flags.robotType() == Enums.RobotType.BOX_DRIVE) this.initBoxDrive();
+            if (flags.robotType() == Enums.RobotType.H_DRIVE2) this.initHDrive2();
             else if (flags.robotType() == Enums.RobotType.H_DRIVE) this.initHDrive();
 
             this.initCommon();
@@ -29,23 +29,36 @@ public class TeleOpMode extends Common {
 
     private void run() {
         Logger.setTelemetry(telemetry);
-        double forwardMultiplier = 1;
-        rotatingBaseServo.setPosition(1);
+        double forwardMultiplier = 0.8;
+        double rotatingBaseMultiplier = 1;
+        if (flags.robotType() == Enums.RobotType.H_DRIVE) rotatingBaseServo.setPosition(1);
         while (opModeIsActive()) {
-            if (gamepad1.left_bumper) forwardMultiplier = 0.45;
-            if (gamepad1.right_bumper) forwardMultiplier = 1;
-            driveTrain.driveRobotCentric(gamepad1.left_stick_y * forwardMultiplier, gamepad1.right_stick_x, gamepad1.left_stick_x);
-            double downMultiplier = 0.4;
-            if (gamepad2.left_stick_y < 0) {
-                // UP
-                slideMotors.setPower(-gamepad2.left_stick_y);
+            if (gamepad1.left_bumper) {
+                forwardMultiplier = 0.45;
+                rotatingBaseMultiplier = 0.4;
             }
-            else if (gamepad2.left_stick_y > 0) {
-                // DOWN
-                slideMotors.setPower(-gamepad2.left_stick_y * downMultiplier);
+            else if (gamepad1.right_bumper) {
+                forwardMultiplier = 1;
+                rotatingBaseMultiplier = 0.6;
+            }
+            double downMultiplier = 0.55;
+            if(Math.abs(gamepad1.right_stick_x) > Math.abs(gamepad1.right_stick_y)) {
+                driveTrain.driveFieldCentric(gamepad1.left_stick_y * forwardMultiplier, gamepad1.right_stick_x, gamepad1.left_stick_x, imu.getAngularOrientation().firstAngle);
+                slideMotors.setPower(0);
             }
             else {
-                slideMotors.setPower(0);
+                if (gamepad1.right_stick_y < 0) {
+                    // UP
+                    slideMotors.setPower(-gamepad1.right_stick_y);
+                }
+                else if (gamepad1.right_stick_y > 0) {
+                    // DOWN
+                    slideMotors.setPower(-gamepad1.right_stick_y * downMultiplier);
+                }
+                else {
+                    slideMotors.setPower(0);
+                }
+                driveTrain.driveFieldCentric(gamepad1.left_stick_y * forwardMultiplier, gamepad1.right_stick_x, gamepad1.left_stick_x, imu.getAngularOrientation().firstAngle);
             }
 
 //            if (Math.abs(gamepad2.right_stick_y) > Math.abs(gamepad2.right_stick_x)) {
@@ -56,9 +69,18 @@ public class TeleOpMode extends Common {
 //                rotatingBase.setPower(gamepad2.right_stick_x * 0.6);
 //                extension.setPower(0);
 //            }
-            extension.setPower(gamepad2.right_stick_y * 0.7);
-            rotatingBase.setPower(gamepad1.left_trigger > gamepad1.right_trigger ? -1 * (gamepad1.left_trigger < 0.65 ? gamepad1.left_trigger * 0.5 : gamepad1.left_trigger) : (gamepad1.right_trigger < 0.65 ? gamepad1.right_trigger * 0.5 : gamepad1.right_trigger));
-
+            if (flags.robotType() == Enums.RobotType.H_DRIVE) extension.setPower(gamepad2.right_stick_y * 0.5);
+            if (flags.robotType() == Enums.RobotType.H_DRIVE) {
+//                if(gamepad1.left_trigger > gamepad1.right_trigger) {
+//                    if(gamepad1.left_trigger < 0.65) rotatingBase.setPower(-0.5 * gamepad1.left_trigger);
+//                    else rotatingBase.setPower(-1 * gamepad1.left_trigger * rotatingBaseMultiplier * rotatingBaseMultiplier);
+//                }
+//                else {
+//                    if(gamepad1.right_trigger < 0.65) rotatingBase.setPower(0.5 * gamepad1.right_trigger * rotatingBaseMultiplier);
+//                    else rotatingBase.setPower(gamepad1.right_trigger * rotatingBaseMultiplier);
+//                }
+                rotatingBase.setPower(gamepad2.left_stick_x * 0.5);
+            }
             if (gamepad2.right_trigger > 0.3) {
                 closeClaw();
             }

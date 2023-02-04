@@ -335,29 +335,13 @@ public class DriveTrain {
 
     // TODO: maybe add a drive field centric method
     public void driveFieldCentric(double forwardVelo, double turnVelo, double strafeVelo, double angle) {
-        double[] velocities = new double[4];
-        velocities[0] = forwardVelo - turnVelo - strafeVelo;
-        velocities[1] = forwardVelo + turnVelo + strafeVelo;
-        velocities[2] = forwardVelo - turnVelo + strafeVelo;
-        velocities[3] = forwardVelo + turnVelo - strafeVelo;
-
-        double max = Arrays.stream(velocities).max().getAsDouble();
-        double min = Arrays.stream(velocities).min().getAsDouble();
-
-        if (max > 1 || min < -1) {
-            double scale = 1 / Math.max(Math.abs(max), Math.abs(min));
-            for (int i = 0; i < velocities.length; i++) {
-                velocities[i] *= scale;
-            }
-        }
-
-        for (int i = 0; i < velocities.length; i++) {
-            velocities[i] *= Math.cos(angle);
-        }
-
-        for (MotorWithLocation motor : this.motors) {
-            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * velocities[motor.location.ordinal()]);
-        }
+        double gamepadAngle = normalizeAngle(Math.toDegrees(Math.atan2(-forwardVelo, strafeVelo)) - 90);
+        Log.i("gamepadAngle", String.valueOf(gamepadAngle));
+        double transformAngle = gamepadAngle - angle;
+        Log.i("transformAngle", String.valueOf(transformAngle));
+        double pow = Math.sqrt(Math.pow(forwardVelo, 2) + Math.pow(strafeVelo, 2));
+        forwardVelo = -Math.cos(Math.toRadians(transformAngle)) * pow;
+        strafeVelo = -Math.sin(Math.toRadians(transformAngle)) * pow;
+        this.driveRobotCentric(forwardVelo, turnVelo, strafeVelo);
     }
 }

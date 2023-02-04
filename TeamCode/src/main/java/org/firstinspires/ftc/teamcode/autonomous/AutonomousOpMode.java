@@ -53,7 +53,7 @@ public class AutonomousOpMode extends Common {
     public void runOpMode() {
         if (flags != null) {
 
-            if (flags.robotType() == Enums.RobotType.X_DRIVE) this.initBoxDrive();
+            if (flags.robotType() == Enums.RobotType.H_DRIVE2) this.initHDrive2();
             else if (flags.robotType() == Enums.RobotType.H_DRIVE) this.initHDrive();
 
             this.initCommon();
