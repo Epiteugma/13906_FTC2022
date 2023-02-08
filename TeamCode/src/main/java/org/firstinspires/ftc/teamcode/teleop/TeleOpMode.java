@@ -27,40 +27,62 @@ public class TeleOpMode extends Common {
     private void initCommon() {
     }
 
+    private void logAll(){
+        Logger.addData("Info: ");
+        Logger.addData("Powers: ");
+        Logger.addData("rotatingBase: " + rotatingBase.getPower());
+        Logger.addData("extension: " + extension.getPower());
+        Logger.addData("slideMotors: " + leftSlide.getPower());
+        Logger.addData("Ticks: ");
+        Logger.addData("leftSlide: " + leftSlide.getCurrentPosition());
+        Logger.addData("rightSlide: " + rightSlide.getCurrentPosition());
+        Logger.addData("extension: " + extension.getCurrentPosition());
+        Logger.addData("rotatingBase: " + rotatingBase.getCurrentPosition());
+        Logger.update();
+    }
+
     private void run() {
         Logger.setTelemetry(telemetry);
-        double forwardMultiplier = 0.8;
-        double rotatingBaseMultiplier = 1;
+        double forwardMultiplier = 1.0;
+        double slideDownMultiplier = 0.59;
         if (flags.robotType() == Enums.RobotType.H_DRIVE) rotatingBaseServo.setPosition(1);
+        boolean fieldCentric = true;
+        double fieldCentricAngle = 0;
+        boolean lastModeSwitchHeld = false;
         while (opModeIsActive()) {
             if (gamepad1.left_bumper) {
                 forwardMultiplier = 0.45;
-                rotatingBaseMultiplier = 0.4;
             }
             else if (gamepad1.right_bumper) {
-                forwardMultiplier = 1;
-                rotatingBaseMultiplier = 0.6;
+                forwardMultiplier = 1.0;
             }
-            double downMultiplier = 0.55;
-            if(Math.abs(gamepad1.right_stick_x) > Math.abs(gamepad1.right_stick_y)) {
-                driveTrain.driveFieldCentric(gamepad1.left_stick_y * forwardMultiplier, gamepad1.right_stick_x, gamepad1.left_stick_x, imu.getAngularOrientation().firstAngle);
+            double turnPower = gamepad1.right_stick_x;
+            if(gamepad1.right_trigger < 0.5) {
                 slideMotors.setPower(0);
             }
             else {
+                turnPower = 0;
                 if (gamepad1.right_stick_y < 0) {
                     // UP
                     slideMotors.setPower(-gamepad1.right_stick_y);
                 }
                 else if (gamepad1.right_stick_y > 0) {
                     // DOWN
-                    slideMotors.setPower(-gamepad1.right_stick_y * downMultiplier);
+                    slideMotors.setPower(-gamepad1.right_stick_y * slideDownMultiplier);
                 }
                 else {
                     slideMotors.setPower(0);
                 }
-                driveTrain.driveFieldCentric(gamepad1.left_stick_y * forwardMultiplier, gamepad1.right_stick_x, gamepad1.left_stick_x, imu.getAngularOrientation().firstAngle);
             }
+            if(fieldCentric) driveTrain.driveFieldCentric(gamepad1.left_stick_y * forwardMultiplier, turnPower, gamepad1.left_stick_x, imu.getAngularOrientation().firstAngle, fieldCentricAngle);
+            else driveTrain.driveRobotCentric(gamepad1.left_stick_y * forwardMultiplier, turnPower, gamepad1.left_stick_x);
 
+            if(gamepad1.cross && !lastModeSwitchHeld) {
+                fieldCentric = !fieldCentric;
+                Log.i("fieldCentric", String.valueOf(fieldCentric));
+                fieldCentricAngle = imu.getAngularOrientation().firstAngle;
+            }
+            lastModeSwitchHeld = gamepad1.cross;
 //            if (Math.abs(gamepad2.right_stick_y) > Math.abs(gamepad2.right_stick_x)) {
 //                extension.setPower(gamepad2.right_stick_y * 0.7);
 //                rotatingBase.setPower(0);
@@ -87,17 +109,7 @@ public class TeleOpMode extends Common {
             else if (gamepad2.left_trigger > 0.3) {
                 openClaw();
             }
-//            Logger.addData("Info: ");
-//            Logger.addData("Powers: ");
-//            Logger.addData("rotatingBase: " + rotatingBase.getPower());
-//            Logger.addData("extension: " + extension.getPower());
-//            Logger.addData("slideMotors: " + leftSlide.getPower());
-//            Logger.addData("Ticks: ");
-//            Logger.addData("leftSlide: " + leftSlide.getCurrentPosition());
-//            Logger.addData("rightSlide: " + rightSlide.getCurrentPosition());
-//            Logger.addData("extension: " + extension.getCurrentPosition());
-//            Logger.addData("rotatingBase: " + rotatingBase.getCurrentPosition());
-//            Logger.update();
+            // logAll();
         }
     }
 }

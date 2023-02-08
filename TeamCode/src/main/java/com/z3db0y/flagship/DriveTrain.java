@@ -334,14 +334,18 @@ public class DriveTrain {
     }
 
     // TODO: maybe add a drive field centric method
-    public void driveFieldCentric(double forwardVelo, double turnVelo, double strafeVelo, double angle) {
+    public void driveFieldCentric(double forwardVelo, double turnVelo, double strafeVelo, double angle, double addAngle) {
         double gamepadAngle = normalizeAngle(Math.toDegrees(Math.atan2(-forwardVelo, strafeVelo)) - 90);
         Log.i("gamepadAngle", String.valueOf(gamepadAngle));
-        double transformAngle = gamepadAngle - angle;
+        double transformAngle = normalizeAngle(gamepadAngle - angle + addAngle);
         Log.i("transformAngle", String.valueOf(transformAngle));
         double pow = Math.sqrt(Math.pow(forwardVelo, 2) + Math.pow(strafeVelo, 2));
         forwardVelo = -Math.cos(Math.toRadians(transformAngle)) * pow;
         strafeVelo = -Math.sin(Math.toRadians(transformAngle)) * pow;
         this.driveRobotCentric(forwardVelo, turnVelo, strafeVelo);
+    }
+
+    public void driveFieldCentric(double forwardVelo, double turnVelo, double strafeVelo, double angle) {
+        this.driveFieldCentric(forwardVelo, turnVelo, strafeVelo, angle, 0);
     }
 }
