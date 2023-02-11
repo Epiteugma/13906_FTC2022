@@ -156,6 +156,13 @@ public class Common extends LinearOpMode {
         rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rotatingBase.setHoldPosition(true);
         extension.setHoldPosition(true);
+        extension.setHoldPower(0.4);
+        rotatingBase.setHoldPower(0.5);
+        slideMotors.setHoldPower(0.8);
+//        extension.getMotorType().setTicksPerRev(28 * 5 * 4);
+//        extension.setStallDetect(true);
+//        leftSlide.getMotorType().setTicksPerRev(28 * 20);
+//        rightSlide.getMotorType().setTicksPerRev(28 * 20);
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();

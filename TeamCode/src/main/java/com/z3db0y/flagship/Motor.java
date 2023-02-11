@@ -15,10 +15,12 @@ public class Motor extends DcMotorImplEx {
 	boolean currentlyHoldingPosition = false;
 	RunMode runMode = RunMode.RUN_WITHOUT_ENCODER;
 	double power = 0.0;
+	double holdPower = 1;
 	double velocity = 0.0;
 	AngleUnit veloUnit = null;
 	int targetPosition = 0;
-
+	double gearRatio;
+	boolean stallDetect;
 	public Motor(DcMotorImplEx motor) {
 		super(motor.getController(), motor.getPortNumber());
 	}
@@ -34,49 +36,64 @@ public class Motor extends DcMotorImplEx {
 				currentlyHoldingPosition = true;
 				super.setTargetPosition(super.getCurrentPosition());
 				super.setMode(RunMode.RUN_TO_POSITION);
-				super.setPower(1);
+				super.setPower(holdPower);
 			}
 		}
 		else {
 			this.currentlyHoldingPosition = false;
-			if(super.getTargetPosition() != this.targetPosition) super.setTargetPosition(this.targetPosition);
-			if(super.getMode() != this.runMode) super.setMode(this.runMode);
-			if(this.velocity != 0) {
+			if (super.getTargetPosition() != this.targetPosition)
+				super.setTargetPosition(this.targetPosition);
+			if (super.getMode() != this.runMode) super.setMode(this.runMode);
+			if (this.velocity != 0) {
 				int dir = this.direction == Direction.FORWARD ? 1 : -1;
-				if(veloUnit == null) ((DcMotorControllerEx) super.controller).setMotorVelocity(super.getPortNumber(), dir * this.velocity);
-				else ((DcMotorControllerEx) super.controller).setMotorVelocity(super.getPortNumber(), dir * this.velocity, this.veloUnit);
+				if (veloUnit == null)
+					((DcMotorControllerEx) super.controller).setMotorVelocity(super.getPortNumber(), dir * this.velocity);
+				else
+					((DcMotorControllerEx) super.controller).setMotorVelocity(super.getPortNumber(), dir * this.velocity, this.veloUnit);
+			} else {
+				if (super.getPower() != this.power) super.setPower(this.power);
 			}
-			else {
-				if(super.getPower() != this.power) super.setPower(this.power);
+			if(this.stalled() && stallDetect) {
+				super.setPower(0);
 			}
-
 		}
 	}
-	
-	public void setHoldPosition(boolean holdPosition) {
-		this.holdPosition = holdPosition;
-		updateMotorState();
+
+	public void setStallDetect(boolean stallDetect){
+		this.stallDetect = stallDetect;
 	}
 
 	long lastStallCheck = 0;
 	int lastTicks = 0;
-	public boolean stalled(int maxTicksPerSec) {
+	boolean lastStallOutput = false;
+	boolean stalled() {
 		if(lastStallCheck == 0) {
 			lastStallCheck = System.currentTimeMillis();
-			lastTicks = super.getCurrentPosition();
-			return false;
+			lastTicks = this.getCurrentPosition();
 		}
-		else {
-			long timeElapsed = System.currentTimeMillis() - lastStallCheck;
-			int maxElapsedTicks = (int) (maxTicksPerSec * this.getPower() * (int) timeElapsed / 1000);
-			int movedTicks = super.getCurrentPosition() - lastTicks;
-			double threshold = .5;
-			int minExpectedTicks = (int) (maxElapsedTicks * threshold);
-			lastStallCheck = System.currentTimeMillis();
-			lastTicks = super.getCurrentPosition();
+		if(System.currentTimeMillis() < lastStallCheck + 12.5) return lastStallOutput;
+		Log.i("lastTicks", String.valueOf(lastTicks));
+		Log.i("currTicks", String.valueOf(this.getCurrentPosition()));
+		Log.i("minTicksChange", String.valueOf(0.0 * (this.power != 0 ? this.power * this.getMotorType().getTicksPerRev() : this.getVelocity())));
+		boolean stalled = false;
+		if(Math.abs(lastTicks - this.getCurrentPosition()) <= Math.abs(0.005 * (this.power != 0 ? this.power * this.getMotorType().getTicksPerRev() : this.getVelocity()))) stalled = true;
+		lastStallCheck = System.currentTimeMillis();
+		lastTicks = this.getCurrentPosition();
+		lastStallOutput = stalled;
+		return stalled;
+	}
 
-			return movedTicks < minExpectedTicks;
-		}
+	public void setHoldPower(double holdPower) {
+		this.holdPower = holdPower;
+	}
+
+	public void setGearRatio(double gearRatio){
+		this.gearRatio = gearRatio;
+	}
+
+	public void setHoldPosition(boolean holdPosition) {
+		this.holdPosition = holdPosition;
+		updateMotorState();
 	}
 
 	@Override

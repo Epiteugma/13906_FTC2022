@@ -7,6 +7,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.autonomous.vision.sleeveRecognition.Detection;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.apriltag.AprilTagPose;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
 
@@ -22,7 +23,7 @@ public class AprilTagRecognition extends LinearOpMode {
         WebcamName camera = hardwareMap.get(WebcamName.class, "Webcam 1");
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         Detection detector = new Detection(camera, cameraMonitorViewId);
-        detector.init(5.32, 1932, 1932, 648, 648);
+        detector.init(5.32, 1932, 1932, 648, 648, OpenCvCameraRotation.UPRIGHT);
 
         waitForStart();
 

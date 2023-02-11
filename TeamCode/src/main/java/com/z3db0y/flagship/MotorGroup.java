@@ -26,6 +26,12 @@ public class MotorGroup {
         motors.remove(motor);
     }
 
+    public void setHoldPower(double power){
+        for(Motor motor : motors) {
+            motor.setHoldPower(power);
+        }
+    }
+
     public void setPower(double power) {
         for(Motor motor : motors) {
             motor.setPower(power);

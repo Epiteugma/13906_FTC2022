@@ -12,11 +12,6 @@ public class Enums {
     }
 
     public enum Side {
-        RIGHT,
-        LEFT;
-    }
-
-    public enum StartPosition {
         LEFT,
         RIGHT;
     }

@@ -2,34 +2,30 @@ package org.firstinspires.ftc.teamcode.autonomous;
 
 import android.util.Log;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.z3db0y.flagship.DriveTrain;
 import com.z3db0y.flagship.Logger;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.teamcode.Common;
 import org.firstinspires.ftc.teamcode.Enums;
+import org.firstinspires.ftc.teamcode.Flags;
+import org.firstinspires.ftc.teamcode.TickUtils;
 import org.firstinspires.ftc.teamcode.TicksToAngles;
 import org.firstinspires.ftc.teamcode.autonomous.vision.sleeveRecognition.Detection;
 import org.firstinspires.ftc.teamcode.autonomous.vision.sleeveRecognition.ParkingPosition;
 import org.firstinspires.ftc.teamcode.autonomous.vision.vuforia.VuforiaTracker;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.openftc.apriltag.AprilTagDetection;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class AutonomousOpMode extends Common {
@@ -47,7 +43,7 @@ public class AutonomousOpMode extends Common {
     public JSONObject map;
     public float[] coneStackLocation;
     public ArrayList<AprilTagDetection> detections;
-    public ParkingPosition parkingPosition = defaultParkingPosition;
+    public ParkingPosition parkingPosition;
     public TicksToAngles rotatingBaseHelper;
 
     public void runOpMode() {
@@ -62,27 +58,12 @@ public class AutonomousOpMode extends Common {
         } else throw new RuntimeException("This class is not annotated with @Flags!");
     }
 
-    void initSleeveDetector() {
-        WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
+    void initSleeveDetector(String deviceName, OpenCvCameraRotation camRot) {
+        WebcamName webcam = hardwareMap.get(WebcamName.class, deviceName);
         easyOpenCvViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         this.detector = new Detection(webcam, easyOpenCvViewId);
-        this.detector.init(5.32, 1932, 1932, 648, 648);
+        this.detector.init(5.32, 1932, 1932, 648, 648, camRot);
         this.detector.waitForCamera();
-    }
-
-    void initVuforia() {
-        // maybe it could rotate all the time like a lidar scanner???
-        WebcamName vuforiaWebcam = hardwareMap.get(WebcamName.class, "vuforiaWebcam");
-        vuforiaViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(vuforiaViewId);
-        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraName = vuforiaWebcam;
-        parameters.useExtendedTracking = false;
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
-        vuforiaTracker = new VuforiaTracker(vuforia, vuforiaWebcam, vuforiaViewId);
-        vuforiaTracker.init();
-        Logger.addData("Status Initialized vuforia tracker");
-        Logger.update();
     }
 
     private void initCommon() {
@@ -112,7 +93,7 @@ public class AutonomousOpMode extends Common {
         terminator.start();
         Logger.setTelemetry(new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()));
         closeClaw(false);
-        initSleeveDetector();
+        initSleeveDetector(this.getClass().getAnnotation(Flags.class).side() == Enums.Side.LEFT ? "leftWebcam" : "rightWebcam", this.getClass().getAnnotation(Flags.class).side() == Enums.Side.LEFT ? OpenCvCameraRotation.UPSIDE_DOWN : OpenCvCameraRotation.UPRIGHT);
     }
 
     public ParkingPosition sleeveDetection(double maxTime) {
@@ -129,13 +110,13 @@ public class AutonomousOpMode extends Common {
             }
             if (timer.milliseconds() > maxTime) {
                 Logger.addData("Status No tags detected, default");
-                break;
+                return defaultParkingPosition;
             }
             Logger.update();
         }
-        detector.stop();
         Logger.addData("Parking Position: " + parkingPosition.name());
         Logger.update();
+        if(parkingPosition == null) return defaultParkingPosition;
         return parkingPosition;
     }
 
@@ -174,7 +155,34 @@ public class AutonomousOpMode extends Common {
     public void pickUpCone() {
     }
 
+    public void left() {
+        driveTrain.driveCM(50, 1, this.getClass().getAnnotation(Flags.class).side() == Enums.Side.LEFT ? DriveTrain.Direction.BACKWARD : DriveTrain.Direction.FORWARD);
+    }
+
+    public void right() {
+        driveTrain.driveCM(50, 1, this.getClass().getAnnotation(Flags.class).side() == Enums.Side.LEFT ? DriveTrain.Direction.FORWARD : DriveTrain.Direction.BACKWARD);
+    }
+
     public void run() {
+        Logger.setTelemetry(telemetry);
         parkingPosition = sleeveDetection(1500);
+        detector.stop();
+        DriveTrain.Direction strafeDir = this.getClass().getAnnotation(Flags.class).side() == Enums.Side.LEFT ? DriveTrain.Direction.LEFT : DriveTrain.Direction.RIGHT;
+        slideMotors.runToPositionAsync(TickUtils.cmToTicks(100, 28 * 18, slideGearRadius), 1);
+        driveTrain.strafeCM(160, 1, strafeDir);
+        sleep(450);
+        slideMotors.runToPosition(TickUtils.cmToTicks(-20, 28 * 18, slideGearRadius), 1);
+        slideMotors.runToPositionAsync(TickUtils.cmToTicks(-75, 28 * 18, slideGearRadius), 1);
+        encloseClaw();
+        driveTrain.driveCM(5, 1, DriveTrain.Direction.BACKWARD);
+        driveTrain.strafeCM(-40, 1, strafeDir);
+        switch (parkingPosition) {
+            case LEFT:
+                left();
+                break;
+            case RIGHT:
+                right();
+                break;
+        }
     }
 }

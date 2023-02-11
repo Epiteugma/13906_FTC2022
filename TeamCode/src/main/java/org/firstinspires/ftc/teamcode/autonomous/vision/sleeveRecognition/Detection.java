@@ -20,7 +20,7 @@ public class Detection {
     VuforiaLocalizer vuforiaHook;
     public CameraState cameraState = CameraState.CLOSED;
 
-    enum CameraState {
+    public enum CameraState {
         CLOSED,
         OPENING,
         OPENED,
@@ -31,13 +31,13 @@ public class Detection {
         this.camera = OpenCvCameraFactory.getInstance().createWebcam(webcam, cameraMonitorViewId);
     }
 
-    public void init(double tagsize, double fx, double fy, double cx, double cy) {
+    public void init(double tagsize, double fx, double fy, double cx, double cy, OpenCvCameraRotation camRot) {
         this.pipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
         this.cameraState = CameraState.OPENING;
         this.camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                camera.startStreaming(640, 480, OpenCvCameraRotation.UPSIDE_DOWN);
+                camera.startStreaming(640, 480, camRot);
                 camera.setPipeline(pipeline);
                 cameraState = CameraState.OPENED;
             }
@@ -50,19 +50,17 @@ public class Detection {
     }
 
     public ArrayList<AprilTagDetection> getRecognitions() {
+        if(this.cameraState != CameraState.OPENED) return new ArrayList<>();
         return this.pipeline.getLatestDetections();
     }
 
     public void waitForCamera() {
-        while(cameraState == CameraState.OPENING || cameraState == CameraState.CLOSED) {
-            Log.i("Camera", "Waiting for camera to open");
-            sleep(100);
-        }
+        double startTime = System.currentTimeMillis();
+        while((cameraState == CameraState.OPENING || cameraState == CameraState.CLOSED) && System.currentTimeMillis() < startTime + 3000) {}
     }
 
     public void stop() {
         this.camera.closeCameraDevice();
-        Log.i("Camera", "Camera closed");
         sleep(1000);
     }
 }

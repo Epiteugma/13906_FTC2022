@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
@@ -9,6 +10,7 @@ import com.z3db0y.flagship.Logger;
 import com.z3db0y.flagship.Motor;
 
 @TeleOp(name = "Motor tester", group = "FTC22")
+@Disabled
 public class MotorTester extends LinearOpMode {
     Motor frontLeft;
     Motor frontRight;

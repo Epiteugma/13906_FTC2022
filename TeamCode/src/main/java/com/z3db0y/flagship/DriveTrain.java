@@ -110,9 +110,9 @@ public class DriveTrain {
                     motor.setRelativeTargetPosition(right);
                     break;
             }
-            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
-        for(Motor motor : motors) motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * velocity);
+        for(Motor motor : motors) motor.setVelocity((motor.getTargetPosition() < 0 ? -1 : 1) * motor.getMotorType().getAchieveableMaxTicksPerSecond() * velocity);
         while(this.isBusy()) {}
         for(Motor motor : motors) motor.setVelocity(0);
     }
@@ -267,12 +267,14 @@ public class DriveTrain {
 
     public void strafe(int ticks, double velocity, Direction direction) {
         for(Motor motor : motors) motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        for(Motor motor : motors) motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         switch (direction) {
             case LEFT:
                 motors[0].setRelativeTargetPosition(-ticks);
                 motors[1].setRelativeTargetPosition(ticks);
                 motors[2].setRelativeTargetPosition(ticks);
                 motors[3].setRelativeTargetPosition(-ticks);
+
                 break;
             case RIGHT:
                 motors[0].setRelativeTargetPosition(ticks);
@@ -281,8 +283,7 @@ public class DriveTrain {
                 motors[3].setRelativeTargetPosition(ticks);
                 break;
         }
-        for(Motor motor : motors) motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        for(Motor motor : motors) motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * velocity);
+        for(Motor motor : motors) motor.setVelocity((motor.getTargetPosition() < 0 ? -1 : 1) * velocity * motor.getMotorType().getAchieveableMaxTicksPerSecond());
         while(this.isBusy()) {}
         for(Motor motor : motors) motor.setVelocity(0);
     }

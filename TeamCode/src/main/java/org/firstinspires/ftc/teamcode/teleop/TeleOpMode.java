@@ -44,7 +44,7 @@ public class TeleOpMode extends Common {
     private void run() {
         Logger.setTelemetry(telemetry);
         double forwardMultiplier = 1.0;
-        double slideDownMultiplier = 0.59;
+        double slideDownMultiplier = 0.65;
         if (flags.robotType() == Enums.RobotType.H_DRIVE) rotatingBaseServo.setPosition(1);
         boolean fieldCentric = true;
         double fieldCentricAngle = 0;
@@ -83,6 +83,9 @@ public class TeleOpMode extends Common {
                 fieldCentricAngle = imu.getAngularOrientation().firstAngle;
             }
             lastModeSwitchHeld = gamepad1.cross;
+
+            if(gamepad1.square) fieldCentricAngle = imu.getAngularOrientation().firstAngle + 90;
+            if(gamepad1.circle) fieldCentricAngle = imu.getAngularOrientation().firstAngle - 90;
 //            if (Math.abs(gamepad2.right_stick_y) > Math.abs(gamepad2.right_stick_x)) {
 //                extension.setPower(gamepad2.right_stick_y * 0.7);
 //                rotatingBase.setPower(0);
@@ -101,7 +104,7 @@ public class TeleOpMode extends Common {
 //                    if(gamepad1.right_trigger < 0.65) rotatingBase.setPower(0.5 * gamepad1.right_trigger * rotatingBaseMultiplier);
 //                    else rotatingBase.setPower(gamepad1.right_trigger * rotatingBaseMultiplier);
 //                }
-                rotatingBase.setPower(gamepad2.left_stick_x * 0.5);
+                rotatingBase.setPower(gamepad2.left_stick_x * (gamepad2.right_bumper ? 0.7 : 0.5));
             }
             if (gamepad2.right_trigger > 0.3) {
                 closeClaw();
