@@ -9,6 +9,7 @@ import com.z3db0y.flagship.Logger;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Common;
 import org.firstinspires.ftc.teamcode.Enums;
+import org.firstinspires.ftc.teamcode.Flags;
 
 public class TeleOpMode extends Common {
 
@@ -49,6 +50,7 @@ public class TeleOpMode extends Common {
         boolean fieldCentric = true;
         double fieldCentricAngle = 0;
         boolean lastModeSwitchHeld = false;
+        double slideMultiplier = this.getClass().getAnnotation(Flags.class).robotType() == Enums.RobotType.H_DRIVE ? 1 : 0.5;
         while (opModeIsActive()) {
             if (gamepad1.left_bumper) {
                 forwardMultiplier = 0.45;
@@ -64,11 +66,11 @@ public class TeleOpMode extends Common {
                 turnPower = 0;
                 if (gamepad1.right_stick_y < 0) {
                     // UP
-                    slideMotors.setPower(-gamepad1.right_stick_y);
+                    slideMotors.setPower(slideMultiplier * -gamepad1.right_stick_y);
                 }
                 else if (gamepad1.right_stick_y > 0) {
                     // DOWN
-                    slideMotors.setPower(-gamepad1.right_stick_y * slideDownMultiplier);
+                    slideMotors.setPower(slideMultiplier * -gamepad1.right_stick_y * slideDownMultiplier);
                 }
                 else {
                     slideMotors.setPower(0);
