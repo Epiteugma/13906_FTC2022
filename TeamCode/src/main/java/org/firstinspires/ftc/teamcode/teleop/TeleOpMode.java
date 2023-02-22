@@ -47,10 +47,10 @@ public class TeleOpMode extends Common {
         double forwardMultiplier = 1.0;
         double slideDownMultiplier = 0.65;
         if (flags.robotType() == Enums.RobotType.H_DRIVE) rotatingBaseServo.setPosition(1);
-        boolean fieldCentric = true;
+        boolean fieldCentric = false;
         double fieldCentricAngle = 0;
-        boolean lastModeSwitchHeld = false;
-        double slideMultiplier = this.getClass().getAnnotation(Flags.class).robotType() == Enums.RobotType.H_DRIVE ? 1 : 0.5;
+//        boolean lastModeSwitchHeld = false;
+        double slideMultiplier = this.getClass().getAnnotation(Flags.class).robotType() == Enums.RobotType.H_DRIVE ? 0.6 : 0.5;
         while (opModeIsActive()) {
             if (gamepad1.left_bumper) {
                 forwardMultiplier = 0.45;
@@ -79,15 +79,15 @@ public class TeleOpMode extends Common {
             if(fieldCentric) driveTrain.driveFieldCentric(gamepad1.left_stick_y * forwardMultiplier, turnPower, gamepad1.left_stick_x, imu.getAngularOrientation().firstAngle, fieldCentricAngle);
             else driveTrain.driveRobotCentric(gamepad1.left_stick_y * forwardMultiplier, turnPower, gamepad1.left_stick_x);
 
-            if(gamepad1.cross && !lastModeSwitchHeld) {
-                fieldCentric = !fieldCentric;
-                Log.i("fieldCentric", String.valueOf(fieldCentric));
-                fieldCentricAngle = imu.getAngularOrientation().firstAngle;
-            }
-            lastModeSwitchHeld = gamepad1.cross;
+//            if(gamepad1.cross && !lastModeSwitchHeld) {
+//                fieldCentric = !fieldCentric;
+//                Log.i("fieldCentric", String.valueOf(fieldCentric));
+//                fieldCentricAngle = imu.getAngularOrientation().firstAngle;
+//            }
+//            lastModeSwitchHeld = gamepad1.cross;
 
-            if(gamepad1.square) fieldCentricAngle = imu.getAngularOrientation().firstAngle + 90;
-            if(gamepad1.circle) fieldCentricAngle = imu.getAngularOrientation().firstAngle - 90;
+//            if(gamepad1.square) fieldCentricAngle = imu.getAngularOrientation().firstAngle + 90;
+//            if(gamepad1.circle) fieldCentricAngle = imu.getAngularOrientation().firstAngle - 90;
 //            if (Math.abs(gamepad2.right_stick_y) > Math.abs(gamepad2.right_stick_x)) {
 //                extension.setPower(gamepad2.right_stick_y * 0.7);
 //                rotatingBase.setPower(0);

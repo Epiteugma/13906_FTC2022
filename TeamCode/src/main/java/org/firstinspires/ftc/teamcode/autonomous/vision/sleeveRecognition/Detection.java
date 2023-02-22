@@ -4,6 +4,8 @@ import static android.os.SystemClock.sleep;
 
 import android.util.Log;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -39,6 +41,7 @@ public class Detection {
             public void onOpened() {
                 camera.startStreaming(640, 480, camRot);
                 camera.setPipeline(pipeline);
+                FtcDashboard.getInstance().startCameraStream(camera, 0);
                 cameraState = CameraState.OPENED;
             }
 
@@ -60,7 +63,6 @@ public class Detection {
     }
 
     public void stop() {
-        this.camera.closeCameraDevice();
-        sleep(1000);
+        this.camera.closeCameraDeviceAsync(() -> {});
     }
 }
