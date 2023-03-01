@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.outoftheboxrobotics.photoncore.PhotonCore;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -124,6 +125,7 @@ public class Common extends LinearOpMode {
     }
 
     public void initHDrive() {
+        PhotonCore.enable();
         double gearRatio = 9.0;
         double wheelDiameter = 7.5;
 
