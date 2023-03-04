@@ -50,7 +50,7 @@ public class TeleOpMode extends Common {
         boolean fieldCentric = false;
         double fieldCentricAngle = 0;
 //        boolean lastModeSwitchHeld = false;
-        double slideMultiplier = this.getClass().getAnnotation(Flags.class).robotType() == Enums.RobotType.H_DRIVE ? 0.6 : 0.5;
+        double slideMultiplier = this.getClass().getAnnotation(Flags.class).robotType() == Enums.RobotType.H_DRIVE ? 1 : 0.5;
         while (opModeIsActive()) {
             if (gamepad1.left_bumper) {
                 forwardMultiplier = 0.45;

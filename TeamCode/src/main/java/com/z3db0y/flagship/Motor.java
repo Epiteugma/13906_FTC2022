@@ -7,10 +7,14 @@ import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
+import com.z3db0y.flagship.pid.PIDCoeffs;
+import com.z3db0y.flagship.pid.PIDController;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class Motor extends DcMotorImplEx {
+	PIDController pidController;
+	boolean usePID = false;
 	boolean holdPosition = false;
 	boolean currentlyHoldingPosition = false;
 	RunMode runMode = RunMode.RUN_WITHOUT_ENCODER;
@@ -105,7 +109,7 @@ public class Motor extends DcMotorImplEx {
 	@Override
 	public void setPower(double power) {
 		this.velocity = 0;
-		this.power = power;
+		this.power = this.usePID ? this.pidController.getOutput(power) : power;
 		updateMotorState();
 	}
 
@@ -181,5 +185,22 @@ public class Motor extends DcMotorImplEx {
 
 	public boolean atTargetPosition(){
 		return Math.abs(this.getCurrentPosition() - this.getTargetPosition()) < 10;
+	}
+
+	public void setPIDCoeffs(PIDCoeffs coeffs) {
+		this.pidController.updateCoeffs(coeffs);
+	}
+
+	public void setPIDCoeffs(double kP, double kI, double kD) {
+		this.pidController.updateCoeffs(kP, kI, kD);
+	}
+
+	public void initPID(int ticksPerRev, int maxRPM) {
+		this.pidController.bind(this, ticksPerRev, maxRPM);
+		this.usePID = true;
+	}
+
+	public void disablePID() {
+		this.usePID = false;
 	}
 }

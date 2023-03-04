@@ -87,7 +87,6 @@ public class DriveTrain {
                     if (!Arrays.asList(type.motorLocations).contains(motor.location)) {
                         throw new IllegalArgumentException("Invalid motor location");
                     }
-                    motor.getMotorType().setTicksPerRev(ticksPerRevolution);
                 }
                 return;
             }
@@ -95,7 +94,7 @@ public class DriveTrain {
         throw new IllegalArgumentException("Invalid motor locations for drive train type");
     }
 
-    public void runTicks(int left, int right, double velocity) {
+    public void runTicks(int left, int right, double power) {
         for (MotorWithLocation motor : this.motors) {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             switch (motor.location) {
@@ -112,9 +111,9 @@ public class DriveTrain {
             }
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
-        for(Motor motor : motors) motor.setVelocity((motor.getTargetPosition() < 0 ? -1 : 1) * motor.getMotorType().getAchieveableMaxTicksPerSecond() * velocity);
+        for(Motor motor : motors) motor.setPower((motor.getTargetPosition() < 0 ? -1 : 1) * power);
         while(this.isBusy()) {}
-        for(Motor motor : motors) motor.setVelocity(0);
+        for(Motor motor : motors) motor.setPower(0);
     }
 
     public void setVelocity(double fr, double fl, double br, double bl) {
@@ -170,69 +169,37 @@ public class DriveTrain {
         return Math.abs((tickSum/this.motors.length) - (targetTickSum/this.motors.length)) > allowedError;
     }
 
-    public void driveVuforia(double distance, double robotAngle, double velocity, VuforiaTracker vuforia) {
+    public void driveRobotCentric(double forward, double turn, double strafe) {
         for (MotorWithLocation motor : this.motors) {
-            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        }
-        double dx = Math.asin(robotAngle) * distance;
-        double dy = Math.acos(robotAngle) * distance;
-        float[] target = vuforia.getLocation();
-        target[0] += dx;
-        target[1] += dy;
-        float[] current = vuforia.getLocation();
-        while(Math.abs(target[0] - current[0]) > 1 || Math.abs(target[1] - current[1]) > 1) {
-            current = vuforia.getLocation();
-            for (MotorWithLocation motor : this.motors) {
-                switch (motor.location) {
-                    case LEFT:
-                    case BACK_LEFT:
-                    case FRONT_LEFT:
-                        motor.setVelocity(velocity * (target[0] - current[0]));
-                        break;
-                    case RIGHT:
-                    case BACK_RIGHT:
-                    case FRONT_RIGHT:
-                        motor.setVelocity(velocity * (target[1] - current[1]));
-                        break;
-                }
-            }
-        }
-        for (MotorWithLocation motor : this.motors) {
-            motor.setVelocity(0);
-        }
-    }
-
-    public void driveRobotCentric(double forwardVelo, double turnVelo, double strafeVelo) {
-        for (MotorWithLocation motor : this.motors) {
-            double resultantVelo = 0;
+            double result = 0;
             switch (motor.location) {
                 case FRONT_LEFT:
-                    resultantVelo = forwardVelo - turnVelo - strafeVelo;
+                    result = forward - turn - strafe;
                     break;
                 case FRONT_RIGHT:
-                    resultantVelo = forwardVelo + turnVelo + strafeVelo;
+                    result = forward + turn + strafe;
                     break;
                 case BACK_LEFT:
-                    resultantVelo = forwardVelo - turnVelo + strafeVelo;
+                    result = forward - turn + strafe;
                     break;
                 case BACK_RIGHT:
-                    resultantVelo = forwardVelo + turnVelo - strafeVelo;
+                    result = forward + turn - strafe;
                     break;
                 case LEFT:
-                    resultantVelo = forwardVelo - turnVelo;
+                    result = forward - turn;
                     break;
                 case RIGHT:
-                    resultantVelo = forwardVelo + turnVelo;
+                    result = forward + turn;
                     break;
                 case FRONT:
-                    resultantVelo = -strafeVelo - turnVelo;
+                    result = -strafe - turn;
                     break;
                 case BACK:
-                    resultantVelo = -strafeVelo + turnVelo;
+                    result = -strafe + turn;
                     break;
             }
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * resultantVelo);
+            motor.setPower(result);
 //            Logger.addData("Setting motor velocity" + motor.location + " to " + motor.getVelocity());
         }
 //        Logger.update();
@@ -265,7 +232,7 @@ public class DriveTrain {
 //        Logger.update();
     }
 
-    public void strafe(int ticks, double velocity, Direction direction) {
+    public void strafe(int ticks, double power, Direction direction) {
         for(Motor motor : motors) motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         for(Motor motor : motors) motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         switch (direction) {
@@ -283,9 +250,9 @@ public class DriveTrain {
                 motors[3].setRelativeTargetPosition(ticks);
                 break;
         }
-        for(Motor motor : motors) motor.setVelocity((motor.getTargetPosition() < 0 ? -1 : 1) * velocity * motor.getMotorType().getAchieveableMaxTicksPerSecond());
+        for(Motor motor : motors) motor.setPower((motor.getTargetPosition() < 0 ? -1 : 1) * power);
         while(this.isBusy()) {}
-        for(Motor motor : motors) motor.setVelocity(0);
+        for(Motor motor : motors) motor.setPower(0);
     }
 
     public void strafeCM(double cm, double velocity, Direction direction) {

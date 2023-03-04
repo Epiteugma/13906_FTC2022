@@ -99,7 +99,7 @@ public class DriveTrain {
                     break;
             }
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            motor.setVelocity(motor.getMotorType().getAchieveableMaxTicksPerSecond() * resultantPower);
+            motor.setPower(resultantPower);
         }
     }
 

@@ -10,7 +10,7 @@ import com.z3db0y.flagship.Logger;
 import com.z3db0y.flagship.Motor;
 
 @TeleOp(name = "Motor tester", group = "FTC22")
-@Disabled
+//@Disabled
 public class MotorTester extends LinearOpMode {
     Motor frontLeft;
     Motor frontRight;

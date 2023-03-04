@@ -126,7 +126,7 @@ public class Common extends LinearOpMode {
 
     public void initHDrive() {
         PhotonCore.enable();
-        double gearRatio = 9.0;
+        double gearRatio = 1.0;
         double wheelDiameter = 7.5;
 
         backLeft = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "backLeft"), DriveTrain.MotorWithLocation.Location.BACK_LEFT);
@@ -134,9 +134,10 @@ public class Common extends LinearOpMode {
         frontLeft = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "frontLeft"), DriveTrain.MotorWithLocation.Location.FRONT_LEFT);
         frontRight = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "frontRight"), DriveTrain.MotorWithLocation.Location.FRONT_RIGHT);
 
-        frontLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
-        backRight.setDirection(DcMotorImplEx.Direction.REVERSE);
+//        frontLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
+//        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
+//        backRight.setDirection(DcMotorImplEx.Direction.REVERSE);
 
         for(DriveTrain.MotorWithLocation motor : new DriveTrain.MotorWithLocation[]{backLeft, backRight, frontLeft, frontRight}) {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
