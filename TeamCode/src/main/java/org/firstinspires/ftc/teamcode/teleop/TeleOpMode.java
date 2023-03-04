@@ -43,6 +43,11 @@ public class TeleOpMode extends Common {
     }
 
     private void run() {
+        backLeft.enablePID();
+        backRight.enablePID();
+        frontLeft.enablePID();
+        frontRight.enablePID();
+
         Logger.setTelemetry(telemetry);
         double forwardMultiplier = 1.0;
         double slideDownMultiplier = 0.65;
@@ -76,8 +81,8 @@ public class TeleOpMode extends Common {
                     slideMotors.setPower(0);
                 }
             }
-            if(fieldCentric) driveTrain.driveFieldCentric(gamepad1.left_stick_y * forwardMultiplier, turnPower, gamepad1.left_stick_x, imu.getAngularOrientation().firstAngle, fieldCentricAngle);
-            else driveTrain.driveRobotCentric(gamepad1.left_stick_y * forwardMultiplier, turnPower, gamepad1.left_stick_x);
+            if(fieldCentric) driveTrain.driveFieldCentric(-gamepad1.left_stick_y * forwardMultiplier, -turnPower, -gamepad1.left_stick_x, imu.getAngularOrientation().firstAngle, fieldCentricAngle);
+            else driveTrain.driveRobotCentric(-gamepad1.left_stick_y * forwardMultiplier, -turnPower, -gamepad1.left_stick_x);
 
 //            if(gamepad1.cross && !lastModeSwitchHeld) {
 //                fieldCentric = !fieldCentric;

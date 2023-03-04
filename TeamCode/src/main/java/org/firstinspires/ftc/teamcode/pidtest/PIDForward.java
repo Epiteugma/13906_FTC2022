@@ -4,7 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.z3db0y.flagship.pid.PIDController;
+import com.z3db0y.flagship.pid.VelocityPIDController;
 
 @Config
 @TeleOp(name = "PIDForward", group = "PID_TEST")
@@ -21,10 +21,10 @@ public class PIDForward extends MiniRobotMode {
         getMotors();
         waitForStart();
 
-        PIDController pidFrontLeft = new PIDController(kP, kI, kD).bind(frontLeft, 288, 125);
-        PIDController pidFrontRight = new PIDController(kP, kI, kD).bind(frontRight, 288, 125);
-        PIDController pidBackLeft = new PIDController(kP, kI, kD).bind(backLeft, 288, 125);
-        PIDController pidBackRight = new PIDController(kP, kI, kD).bind(backRight, 288, 125);
+        VelocityPIDController pidFrontLeft = new VelocityPIDController(kP, kI, kD).bind(frontLeft, 288, 125);
+        VelocityPIDController pidFrontRight = new VelocityPIDController(kP, kI, kD).bind(frontRight, 288, 125);
+        VelocityPIDController pidBackLeft = new VelocityPIDController(kP, kI, kD).bind(backLeft, 288, 125);
+        VelocityPIDController pidBackRight = new VelocityPIDController(kP, kI, kD).bind(backRight, 288, 125);
 
         pidFrontLeft.setDebug(telemetry, "frontLeft");
         pidFrontRight.setDebug(telemetry, "frontRight");

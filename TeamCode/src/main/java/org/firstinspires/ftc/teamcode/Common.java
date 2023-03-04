@@ -35,6 +35,7 @@ public class Common extends LinearOpMode {
     public Servo leftClaw;
     public Servo rightClaw;
     public Servo rotatingBaseServo;
+    public CommonConfig config;
 
     public static double slideGearRadius = 4.75/2;
     public static double extensionGearRadius = 4.75/2;
@@ -42,6 +43,8 @@ public class Common extends LinearOpMode {
     @Override public void runOpMode() {}
 
     public void initHDrive2() {
+        config = new HDRIVE2_Config();
+
         double gearRatio = 5 * 3;
         double wheelDiameter = 9;
 
@@ -49,6 +52,11 @@ public class Common extends LinearOpMode {
         backRight = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "backRight"), DriveTrain.MotorWithLocation.Location.BACK_RIGHT);
         frontLeft = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "frontLeft"), DriveTrain.MotorWithLocation.Location.FRONT_LEFT);
         frontRight = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "frontRight"), DriveTrain.MotorWithLocation.Location.FRONT_RIGHT);
+
+        backLeft.initPID((int) gearRatio * 28, 6000);
+        backRight.initPID((int) gearRatio * 28, 6000);
+        frontLeft.initPID((int) gearRatio * 28, 6000);
+        frontRight.initPID((int) gearRatio * 28, 6000);
 
         frontLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
         backLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
@@ -125,14 +133,21 @@ public class Common extends LinearOpMode {
     }
 
     public void initHDrive() {
+        config = new HDRIVE_Config();
+
         PhotonCore.enable();
-        double gearRatio = 1.0;
+        double gearRatio = 5;
         double wheelDiameter = 7.5;
 
         backLeft = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "backLeft"), DriveTrain.MotorWithLocation.Location.BACK_LEFT);
         backRight = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "backRight"), DriveTrain.MotorWithLocation.Location.BACK_RIGHT);
         frontLeft = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "frontLeft"), DriveTrain.MotorWithLocation.Location.FRONT_LEFT);
         frontRight = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "frontRight"), DriveTrain.MotorWithLocation.Location.FRONT_RIGHT);
+
+        backLeft.initPID((int) gearRatio * 28, 6000);
+        backRight.initPID((int) gearRatio * 28, 6000);
+        frontLeft.initPID((int) gearRatio * 28, 6000);
+        frontRight.initPID((int) gearRatio * 28, 6000);
 
 //        frontLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
 //        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);

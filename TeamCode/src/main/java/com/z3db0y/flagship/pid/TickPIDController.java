@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class PIDController {
+public class TickPIDController {
     private Telemetry telem;
     private String TAG = "";
 
@@ -20,29 +20,28 @@ public class PIDController {
     double D = 0;
     double prevErr = 0;
     long lastT = 0;
-    int lastPos = 0;
     int rpm = 0;
 
-    public PIDController(double kP, double kI, double kD) {
+    public TickPIDController(double kP, double kI, double kD) {
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
     }
 
-    public PIDController(PIDCoeffs coeffs) {
+    public TickPIDController(PIDCoeffs coeffs) {
         this.kP = coeffs.kP;
         this.kI = coeffs.kI;
         this.kD = coeffs.kD;
     }
 
-    public PIDController() {}
+    public TickPIDController() {}
 
     public void setDebug(Telemetry telem, String tag) {
         this.telem = telem;
         this.TAG = tag;
     }
 
-    public PIDController bind(DcMotor motor, int ticksPerRev, int rpm) {
+    public TickPIDController bind(DcMotor motor, int ticksPerRev, int rpm) {
         this.motor = motor;
         this.P = 0;
         this.I = 0;
@@ -54,26 +53,24 @@ public class PIDController {
         return this;
     }
 
-    public PIDController updateCoeffs(double kP, double kI, double kD) {
+    public TickPIDController updateCoeffs(double kP, double kI, double kD) {
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
         return this;
     }
 
-    public PIDController updateCoeffs(PIDCoeffs coeffs) {
+    public TickPIDController updateCoeffs(PIDCoeffs coeffs) {
         this.kP = coeffs.kP;
         this.kI = coeffs.kI;
         this.kD = coeffs.kD;
         return this;
     }
 
-    public double getOutput(double power) {
+    public double getOutput(double target) {
         double dt = System.currentTimeMillis() - this.lastT;
         this.lastT += dt;
-        double target = (power * this.ticksPerRev * this.rpm) / 60000 * dt;
-        double actual = this.motor.getCurrentPosition() - this.lastPos;
-        this.lastPos = this.motor.getCurrentPosition();
+        double actual = this.motor.getCurrentPosition();
         double err = target - actual;
         this.P = this.kP * err;
         this.I = this.kI * err * (dt/1000);
@@ -81,7 +78,7 @@ public class PIDController {
         this.D = this.kD * (err - this.prevErr) / dt;
         this.prevErr = err;
         double out = this.P + this.It + this.D;
-        out /= this.ticksPerRev * this.rpm / 60000.0 * dt;
+        out /= target;
 
         if(this.telem != null) {
             this.telem.addData(this.TAG + "/target", target);
@@ -92,7 +89,7 @@ public class PIDController {
         return out;
     }
 
-    public void run(double power) {
-        this.motor.setPower(this.getOutput(power));
+    public void run(double target) {
+        this.motor.setPower(this.getOutput(target));
     }
 }

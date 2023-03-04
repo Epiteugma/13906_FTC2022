@@ -6,7 +6,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.z3db0y.flagship.pid.AngularPIDController;
-import com.z3db0y.flagship.pid.PIDController;
+import com.z3db0y.flagship.pid.VelocityPIDController;
 
 @Config
 @TeleOp(name = "FullPIDForward", group = "PID_TEST")
@@ -39,10 +39,10 @@ public class FullPIDForward extends BigRobotMode {
         getMotors();
         waitForStart();
 
-        PIDController pidFrontLeft = new PIDController(drive_kP, drive_kI, drive_kD).bind(frontLeft, 28 * 5, 6000);
-        PIDController pidFrontRight = new PIDController(drive_kP, drive_kI, drive_kD).bind(frontRight, 28 * 5, 6000);
-        PIDController pidBackLeft = new PIDController(drive_kP, drive_kI, drive_kD).bind(backLeft, 28 * 5, 6000);
-        PIDController pidBackRight = new PIDController(drive_kP, drive_kI, drive_kD).bind(backRight, 28 * 5, 6000);
+        VelocityPIDController pidFrontLeft = new VelocityPIDController(drive_kP, drive_kI, drive_kD).bind(frontLeft, 28 * 5, 6000);
+        VelocityPIDController pidFrontRight = new VelocityPIDController(drive_kP, drive_kI, drive_kD).bind(frontRight, 28 * 5, 6000);
+        VelocityPIDController pidBackLeft = new VelocityPIDController(drive_kP, drive_kI, drive_kD).bind(backLeft, 28 * 5, 6000);
+        VelocityPIDController pidBackRight = new VelocityPIDController(drive_kP, drive_kI, drive_kD).bind(backRight, 28 * 5, 6000);
 
         pidFrontLeft.setDebug(telemetry, "frontLeft");
         pidFrontRight.setDebug(telemetry, "frontRight");

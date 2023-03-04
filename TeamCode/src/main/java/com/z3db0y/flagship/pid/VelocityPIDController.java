@@ -1,89 +1,87 @@
 package com.z3db0y.flagship.pid;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-public class AngularPIDController {
+public class VelocityPIDController {
+    private Telemetry telem;
+    private String TAG = "";
+
     double kP = 1;
     double kI = 0;
     double kD = 0;
+    int ticksPerRev;
+    DcMotor motor;
 
-    String TAG;
-    Telemetry telem;
-
-    BNO055IMU imu;
     double P = 0;
     double I = 0;
     double It = 0;
     double D = 0;
-    long lastT;
-    double prevErr;
+    double prevErr = 0;
+    long lastT = 0;
+    int lastPos = 0;
+    int rpm = 0;
 
-    public AngularPIDController() {}
-
-    public AngularPIDController(double kP, double kI, double kD) {
+    public VelocityPIDController(double kP, double kI, double kD) {
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
     }
 
-    public AngularPIDController(PIDCoeffs coeffs) {
+    public VelocityPIDController(PIDCoeffs coeffs) {
         this.kP = coeffs.kP;
         this.kI = coeffs.kI;
         this.kD = coeffs.kD;
     }
+
+    public VelocityPIDController() {}
 
     public void setDebug(Telemetry telem, String tag) {
         this.telem = telem;
         this.TAG = tag;
     }
 
-    public AngularPIDController bind(BNO055IMU imu) {
-        this.imu = imu;
+    public VelocityPIDController bind(DcMotor motor, int ticksPerRev, int rpm) {
+        this.motor = motor;
         this.P = 0;
         this.I = 0;
         this.It = 0;
         this.D = 0;
-        this.lastT = 0;
         this.prevErr = 0;
+        this.ticksPerRev = ticksPerRev;
+        this.rpm = rpm;
         return this;
     }
 
-    double normalizeAngle(double angle) {
-        while(angle > 180) angle -= 360;
-        while(angle < -180) angle += 360;
-        return angle;
-    }
-
-    public AngularPIDController updateCoeffs(double kP, double kI, double kD) {
+    public VelocityPIDController updateCoeffs(double kP, double kI, double kD) {
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
         return this;
     }
 
-    public AngularPIDController updateCoeffs(PIDCoeffs coeffs) {
+    public VelocityPIDController updateCoeffs(PIDCoeffs coeffs) {
         this.kP = coeffs.kP;
         this.kI = coeffs.kI;
         this.kD = coeffs.kD;
         return this;
     }
 
-    public double getOutput(double target, int angle) {
+    public double getOutput(double power) {
         double dt = System.currentTimeMillis() - this.lastT;
         this.lastT += dt;
-        Orientation orientation = imu.getAngularOrientation();
-        double actual = angle == 1 ? orientation.firstAngle : angle == 2 ? orientation.secondAngle : angle == 3 ? orientation.thirdAngle : 0;
-        double err =  normalizeAngle(target - actual);
+        double target = (power * this.ticksPerRev * this.rpm) / 60000 * dt;
+        double actual = this.motor.getCurrentPosition() - this.lastPos;
+        this.lastPos = this.motor.getCurrentPosition();
+        double err = target - actual;
         this.P = this.kP * err;
         this.I = this.kI * err * (dt/1000);
         this.It += this.I;
         this.D = this.kD * (err - this.prevErr) / dt;
         this.prevErr = err;
         double out = this.P + this.It + this.D;
-        out /= 45;
+        out /= this.ticksPerRev * this.rpm / 60000.0 * dt;
 
         if(this.telem != null) {
             this.telem.addData(this.TAG + "/target", target);
@@ -92,5 +90,9 @@ public class AngularPIDController {
         }
 
         return out;
+    }
+
+    public void run(double power) {
+        this.motor.setPower(this.getOutput(power));
     }
 }
