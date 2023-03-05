@@ -167,7 +167,7 @@ public class AutonomousOpMode extends Common {
         switch(parkingPosition){
             case LEFT:
                 pidQueue.add(new PIDTask(PIDTaskType.TURN, 0, 0.4));
-                pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(35, ticksPerRev, wheelRadius), 0.55));
+                pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(40, ticksPerRev, wheelRadius), 0.55));
                 break;
             case CENTER:
                 pidQueue.add(new PIDTask(PIDTaskType.TURN, 0, 0.4));
