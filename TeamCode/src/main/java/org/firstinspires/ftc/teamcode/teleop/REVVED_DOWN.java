@@ -8,5 +8,5 @@ import org.firstinspires.ftc.teamcode.Flags;
 
 @TeleOp(name="HDrive 2", group="FTC22")
 @Flags(robotType = Enums.RobotType.REVVED_DOWN)
-@Disabled
+//@Disabled
 public class REVVED_DOWN extends TeleOpMode {}

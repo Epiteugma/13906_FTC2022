@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.z3db0y.flagship.Logger;
 
 import org.firstinspires.ftc.teamcode.Common;
@@ -26,18 +28,23 @@ public class TeleOpMode extends Common {
     private void logAll(){
         Logger.addData("Info: ");
         Logger.addData("Powers: ");
-        Logger.addData("rotatingBase: " + rotatingBase.getPower());
-        Logger.addData("extension: " + extension.getPower());
+        if (flags.robotType() == Enums.RobotType.REVVED_UP) {
+            Logger.addData("rotatingBase: " + rotatingBase.getPower());
+            Logger.addData("extension: " + extension.getPower());
+        }
         Logger.addData("slideMotors: " + leftSlide.getPower());
         Logger.addData("Ticks: ");
         Logger.addData("leftSlide: " + leftSlide.getCurrentPosition());
         Logger.addData("rightSlide: " + rightSlide.getCurrentPosition());
-        Logger.addData("extension: " + extension.getCurrentPosition());
-        Logger.addData("rotatingBase: " + rotatingBase.getCurrentPosition());
+        if (flags.robotType() == Enums.RobotType.REVVED_UP) {
+            Logger.addData("extension: " + extension.getCurrentPosition());
+            Logger.addData("rotatingBase: " + rotatingBase.getCurrentPosition());
+        }
         Logger.update();
     }
 
     private void run() {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         backLeft.enablePID();
         backRight.enablePID();
         frontLeft.enablePID();
@@ -45,12 +52,12 @@ public class TeleOpMode extends Common {
 
         Logger.setTelemetry(telemetry);
         double forwardMultiplier = 1.0;
-        double slideDownMultiplier = 0.65;
+        double slideDownMultiplier = flags.robotType() == Enums.RobotType.REVVED_UP ? 0.65 : 0.8;
         if (flags.robotType() == Enums.RobotType.REVVED_UP) rotatingBaseServo.setPosition(1);
         boolean fieldCentric = false;
         double fieldCentricAngle = 0;
 //        boolean lastModeSwitchHeld = false;
-        double slideMultiplier = this.getClass().getAnnotation(Flags.class).robotType() == Enums.RobotType.REVVED_UP ? 1 : 0.5;
+        double slideMultiplier = this.getClass().getAnnotation(Flags.class).robotType() == Enums.RobotType.REVVED_UP ? 1 : 0.3;
         while (opModeIsActive()) {
             if (gamepad1.left_bumper) {
                 forwardMultiplier = 0.45;

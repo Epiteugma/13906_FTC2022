@@ -29,6 +29,9 @@ public class Common extends LinearOpMode {
     public Servo rotatingBaseServo;
     public CommonConfig config;
 
+    public CommonConfig.ServoConfig leftServoConfig;
+    public CommonConfig.ServoConfig rightServoConfig;
+
     @Override public void runOpMode() {}
 
     public void initHDrive2() {
@@ -48,8 +51,8 @@ public class Common extends LinearOpMode {
         frontLeft.initPID(gearRatio * 28, 6000);
         frontRight.initPID(gearRatio * 28, 6000);
 
-        backLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
-        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorImplEx.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 //        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         driveTrain = new DriveTrain(DriveTrain.Type.MECANUM, new DriveTrain.MotorWithLocation[]{frontLeft, backRight, frontRight, backLeft}, wheelDiameter, ticksPerRev, gearRatio);
@@ -76,8 +79,8 @@ public class Common extends LinearOpMode {
     }
 
     public void openClaw(boolean async){
-        leftClaw.setPosition(0.65);
-        rightClaw.setPosition(0.65);
+        leftClaw.setPosition(config.getLeftClawConfig().openPosition);
+        rightClaw.setPosition(config.getRightClawConfig().openPosition);
         if(!async) sleep(1200);
     }
 
@@ -98,8 +101,8 @@ public class Common extends LinearOpMode {
 //    }
 
     public void closeClaw(boolean async){
-        leftClaw.setPosition(0.94);
-        rightClaw.setPosition(0.94);
+        leftClaw.setPosition(config.getLeftClawConfig().closedPosition);
+        rightClaw.setPosition(config.getRightClawConfig().closedPosition);
         if(!async) sleep(1200);
     }
 
@@ -119,8 +122,8 @@ public class Common extends LinearOpMode {
     }
 
     public void encloseClaw(){
-        leftClaw.setPosition(0.5);
-        rightClaw.setPosition(0.5);
+        leftClaw.setPosition(config.getLeftClawConfig().openPosition * 0.77);
+        rightClaw.setPosition(config.getRightClawConfig().openPosition * 0.77);
     }
 
     public void initHDrive() {

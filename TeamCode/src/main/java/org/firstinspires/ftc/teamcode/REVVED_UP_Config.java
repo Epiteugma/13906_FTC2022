@@ -18,7 +18,8 @@ public class REVVED_UP_Config extends CommonConfig {
     public static DriveTrain driveTrain           = new DriveTrain(12, 28, 6000, 7.5);
     public static SlideConfig slideConfig         = new SlideConfig(28, 15, 4.75);
     public static ExtensionConfig extensionConfig = new ExtensionConfig(28, 20, 4.75);
-
+    public static ServoConfig leftClawConfig      = new ServoConfig(0.65, 0.94);
+    public static ServoConfig rightClawConfig     = new ServoConfig(0.65, 0.94);
 
     public PIDCoeffs getBackLeftVeloPID() {
         return backLeftVeloPID;
@@ -68,4 +69,11 @@ public class REVVED_UP_Config extends CommonConfig {
         return extensionConfig;
     }
 
+    public ServoConfig getLeftClawConfig() {
+        return leftClawConfig;
+    }
+
+    public ServoConfig getRightClawConfig() {
+        return rightClawConfig;
+    }
 }
