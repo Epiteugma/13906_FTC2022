@@ -146,23 +146,22 @@ public class AutonomousOpMode extends Common {
         Log.i("slide", "finished");
         List<PIDTask> pidQueue = new ArrayList<>();
         pidQueue.add(new PIDTask(PIDTaskType.STRAFE, TickUtils.cmToTicks(-10 * sideMlt, ticksPerRev, wheelRadius), 1));
-        pidQueue.add(new PIDTask(PIDTaskType.TURN, -90 * sideMlt, 0.4));
-        pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(85, ticksPerRev, wheelRadius), 0.55));
+        pidQueue.add(new PIDTask(PIDTaskType.TURN, -90 * sideMlt, 1));
+        pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(85, ticksPerRev, wheelRadius), 1));
         pidQueue.add(new PIDTask(PIDTaskType.TURN, -45 * sideMlt, 0.3, () -> {
             slideMotors.runToPosition(TickUtils.cmToTicks(102.5, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1);
             extension.runToPosition(TickUtils.cmToTicks(35, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM/2), 1);
             slideMotors.runToPosition(TickUtils.cmToTicks(-90, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1);
             openClaw();
         }));
-        pidQueue.add(new PIDTask(PIDTaskType.TURN, -180, 0.4));
+        pidQueue.add(new PIDTask(PIDTaskType.TURN, -180, 1));
         pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(23, ticksPerRev, wheelRadius), 0.4, () -> {
             closeClaw();
             slideMotors.runToPosition(TickUtils.cmToTicks(24, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1);
         }));
-        pidQueue.add(new PIDTask(PIDTaskType.TURN, -90 * sideMlt, 0.4));
-        pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(-10, ticksPerRev, wheelRadius), 0.4, () -> {
-            slideMotors.runToPosition(TickUtils.cmToTicks(-18, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1);
+        pidQueue.add(new PIDTask(PIDTaskType.TURN, -90 * sideMlt, 0.4, () -> {
             extension.runToPosition(TickUtils.cmToTicks(-25, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM/2), 1);
+            slideMotors.runToPosition(TickUtils.cmToTicks(-18, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1);
             openClaw();
         }));
         switch(parkingPosition){
