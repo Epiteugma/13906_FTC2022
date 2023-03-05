@@ -11,4 +11,5 @@ public @interface Flags {
     Enums.RobotType robotType();
     Enums.Alliance alliance() default Enums.Alliance.RED;
     Enums.Side side() default Enums.Side.LEFT;
+    boolean debug() default false;
 }

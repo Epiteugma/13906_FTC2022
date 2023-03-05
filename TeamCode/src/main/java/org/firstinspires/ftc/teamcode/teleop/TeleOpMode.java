@@ -114,7 +114,9 @@ public class TeleOpMode extends Common {
             else if (gamepad2.left_trigger > 0.3) {
                 openClaw();
             }
-//             logAll();
+            if (flags.debug()){
+                logAll();
+            }
         }
     }
 }
