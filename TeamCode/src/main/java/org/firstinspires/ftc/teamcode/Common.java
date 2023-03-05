@@ -49,7 +49,8 @@ public class Common extends LinearOpMode {
         frontRight.initPID(gearRatio * 28, 6000);
 
         backLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+//        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         driveTrain = new DriveTrain(DriveTrain.Type.MECANUM, new DriveTrain.MotorWithLocation[]{frontLeft, backRight, frontRight, backLeft}, wheelDiameter, ticksPerRev, gearRatio);
 
