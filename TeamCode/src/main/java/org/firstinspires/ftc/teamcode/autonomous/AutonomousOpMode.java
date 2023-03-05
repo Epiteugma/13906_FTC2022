@@ -129,6 +129,7 @@ public class AutonomousOpMode extends Common {
     }
 
     public void run() {
+        int sideMlt = this.getClass().getAnnotation(Flags.class).side() == Enums.Side.LEFT ? -1 : 1;
         int ticksPerRev = config.getDrivetrain().ticksPerRev * config.getDrivetrain().gearRatio;
         int maxRPM = config.getDrivetrain().maxRPM;
         double wheelRadius = config.getDrivetrain().wheelDiameterCM/2;
@@ -144,10 +145,10 @@ public class AutonomousOpMode extends Common {
         slideMotors.runToPosition(TickUtils.cmToTicks(10, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1);
         Log.i("slide", "finished");
         List<PIDTask> pidQueue = new ArrayList<>();
-        pidQueue.add(new PIDTask(PIDTaskType.STRAFE, TickUtils.cmToTicks(-10, ticksPerRev, wheelRadius), 1));
-        pidQueue.add(new PIDTask(PIDTaskType.TURN, -90, 0.4));
+        pidQueue.add(new PIDTask(PIDTaskType.STRAFE, TickUtils.cmToTicks(-10 * sideMlt, ticksPerRev, wheelRadius), 1));
+        pidQueue.add(new PIDTask(PIDTaskType.TURN, -90 * sideMlt, 0.4));
         pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(85, ticksPerRev, wheelRadius), 0.55));
-        pidQueue.add(new PIDTask(PIDTaskType.TURN, -45, 0.3, () -> {
+        pidQueue.add(new PIDTask(PIDTaskType.TURN, -45 * sideMlt, 0.3, () -> {
             slideMotors.runToPosition(TickUtils.cmToTicks(102.5, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1);
             extension.runToPosition(TickUtils.cmToTicks(35, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM/2), 1);
             slideMotors.runToPosition(TickUtils.cmToTicks(-90, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1);
@@ -158,7 +159,7 @@ public class AutonomousOpMode extends Common {
             closeClaw();
             slideMotors.runToPosition(TickUtils.cmToTicks(24, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1);
         }));
-        pidQueue.add(new PIDTask(PIDTaskType.TURN, -90, 0.4));
+        pidQueue.add(new PIDTask(PIDTaskType.TURN, -90 * sideMlt, 0.4));
         pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(-10, ticksPerRev, wheelRadius), 0.4, () -> {
             slideMotors.runToPosition(TickUtils.cmToTicks(-18, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1);
             extension.runToPosition(TickUtils.cmToTicks(-25, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM/2), 1);
