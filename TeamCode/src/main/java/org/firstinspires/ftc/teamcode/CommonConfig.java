@@ -3,6 +3,44 @@ package org.firstinspires.ftc.teamcode;
 import com.z3db0y.flagship.pid.PIDCoeffs;
 
 public class CommonConfig {
+    public static class DriveTrain {
+        public int gearRatio = 1;
+        public int ticksPerRev = 28;
+        public int maxRPM = 6000;
+        public double wheelDiameterCM;
+
+        public DriveTrain(int gearRatio, int ticksPerRev, int maxRPM, double wheelDiameterCM) {
+            this.gearRatio = gearRatio;
+            this.ticksPerRev = ticksPerRev;
+            this.maxRPM = maxRPM;
+            this.wheelDiameterCM = wheelDiameterCM;
+        }
+    }
+
+    public static class SlideConfig {
+        public int ticksPerRev = 28;
+        public int gearRatio = 1;
+        public double wheelDiameterCM;
+
+        public SlideConfig(int ticksPerRev, int gearRatio, double wheelDiameterCM) {
+            this.ticksPerRev = ticksPerRev;
+            this.gearRatio = gearRatio;
+            this.wheelDiameterCM = wheelDiameterCM;
+        }
+    }
+
+    public static class ExtensionConfig {
+        public int ticksPerRev = 28;
+        public int gearRatio = 1;
+        public double wheelDiameterCM;
+
+        public ExtensionConfig(int ticksPerRev, int gearRatio, double wheelDiameterCM) {
+            this.ticksPerRev = ticksPerRev;
+            this.gearRatio = gearRatio;
+            this.wheelDiameterCM = wheelDiameterCM;
+        }
+    }
+
     public PIDCoeffs getBackLeftVeloPID() {
         return null;
     }
@@ -38,4 +76,16 @@ public class CommonConfig {
     public PIDCoeffs getAngularPID() {
         return null;
     }
+
+    public DriveTrain getDrivetrain() {
+        return null;
+    }
+
+    public SlideConfig getSlideConfig() {
+        return null;
+    }
+    public ExtensionConfig getExtensionConfig() {
+        return null;
+    }
+
 }

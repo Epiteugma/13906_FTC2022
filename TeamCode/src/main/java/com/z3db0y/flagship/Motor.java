@@ -161,8 +161,8 @@ public class Motor extends DcMotorImplEx {
 	}
 
 	public void runToPosition(int ticks, double power, boolean relative) {
-		if(relative) this.setRelativeTargetPosition(ticks);
-		else this.setTargetPosition(ticks);
+		if(relative) this.resetEncoder();
+		this.setTargetPosition(ticks);
 		this.setMode(RunMode.RUN_TO_POSITION);
 		this.setPower(power);
 		while (this.isBusy()) {}
@@ -174,8 +174,8 @@ public class Motor extends DcMotorImplEx {
 	}
 
 	public void runToPositionAsync(int ticks, double power, boolean relative) {
-		if(relative) this.setRelativeTargetPosition(ticks);
-		else this.setTargetPosition(ticks);
+		if(relative) this.resetEncoder();
+		this.setTargetPosition(ticks);
 		this.setMode(RunMode.RUN_TO_POSITION);
 		this.setPower(power);
 	}
@@ -185,7 +185,7 @@ public class Motor extends DcMotorImplEx {
 	}
 
 	public boolean atTargetPosition(){
-		return Math.abs(this.getCurrentPosition() - this.getTargetPosition()) < 10;
+		return Math.abs(this.getCurrentPosition() - this.getTargetPosition()) < 20;
 	}
 
 	public void setPIDCoeffs(PIDCoeffs coeffs) {

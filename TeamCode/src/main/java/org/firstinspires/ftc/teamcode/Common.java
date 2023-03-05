@@ -1,11 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.outoftheboxrobotics.photoncore.PhotonCore;
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -14,13 +11,8 @@ import com.z3db0y.flagship.DriveTrain;
 import com.z3db0y.flagship.Motor;
 import com.z3db0y.flagship.MotorGroup;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.autonomous.AutonomousOpMode;
-
 public class Common extends LinearOpMode {
     public Flags flags = this.getClass().isAnnotationPresent(Flags.class) ? this.getClass().getAnnotation(Flags.class) : null;
-    public WebcamName webcamName;
     public DriveTrain.MotorWithLocation frontLeft;
     public DriveTrain.MotorWithLocation frontRight;
     public DriveTrain.MotorWithLocation backLeft;
@@ -37,31 +29,29 @@ public class Common extends LinearOpMode {
     public Servo rotatingBaseServo;
     public CommonConfig config;
 
-    public static double slideGearRadius = 4.75/2;
-    public static double extensionGearRadius = 4.75/2;
-
     @Override public void runOpMode() {}
 
     public void initHDrive2() {
-        config = new HDRIVE2_Config();
+        config = new REVVED_DOWN_Config();
 
-        double gearRatio = 5 * 3;
-        double wheelDiameter = 9;
+        int gearRatio = config.getDrivetrain().gearRatio;
+        int ticksPerRev = config.getDrivetrain().ticksPerRev;
+        double wheelDiameter = config.getDrivetrain().wheelDiameterCM;
 
         backLeft = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "backLeft"), DriveTrain.MotorWithLocation.Location.BACK_LEFT);
         backRight = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "backRight"), DriveTrain.MotorWithLocation.Location.BACK_RIGHT);
         frontLeft = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "frontLeft"), DriveTrain.MotorWithLocation.Location.FRONT_LEFT);
         frontRight = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "frontRight"), DriveTrain.MotorWithLocation.Location.FRONT_RIGHT);
 
-        backLeft.initPID((int) gearRatio * 28, 6000);
-        backRight.initPID((int) gearRatio * 28, 6000);
-        frontLeft.initPID((int) gearRatio * 28, 6000);
-        frontRight.initPID((int) gearRatio * 28, 6000);
+        backLeft.initPID(gearRatio * 28, 6000);
+        backRight.initPID(gearRatio * 28, 6000);
+        frontLeft.initPID(gearRatio * 28, 6000);
+        frontRight.initPID(gearRatio * 28, 6000);
 
-        frontLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
         backLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        driveTrain = new DriveTrain(DriveTrain.Type.MECANUM, new DriveTrain.MotorWithLocation[]{frontLeft, backRight, frontRight, backLeft}, wheelDiameter, gearRatio);
+        driveTrain = new DriveTrain(DriveTrain.Type.MECANUM, new DriveTrain.MotorWithLocation[]{frontLeft, backRight, frontRight, backLeft}, wheelDiameter, ticksPerRev, gearRatio);
 
         leftSlide = new Motor(hardwareMap.get(DcMotorImplEx.class, "leftSlide"));
         rightSlide = new Motor(hardwareMap.get(DcMotorImplEx.class, "rightSlide"));
@@ -133,33 +123,35 @@ public class Common extends LinearOpMode {
     }
 
     public void initHDrive() {
-        config = new HDRIVE_Config();
+        config = new REVVED_UP_Config();
 
-        PhotonCore.enable();
-        double gearRatio = 5;
-        double wheelDiameter = 7.5;
+//        PhotonCore.enable();
+        int gearRatio = config.getDrivetrain().gearRatio;
+        int ticksPerRev = config.getDrivetrain().ticksPerRev;
+        double wheelDiameter = config.getDrivetrain().wheelDiameterCM;
 
         backLeft = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "backLeft"), DriveTrain.MotorWithLocation.Location.BACK_LEFT);
         backRight = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "backRight"), DriveTrain.MotorWithLocation.Location.BACK_RIGHT);
         frontLeft = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "frontLeft"), DriveTrain.MotorWithLocation.Location.FRONT_LEFT);
         frontRight = new DriveTrain.MotorWithLocation(hardwareMap.get(DcMotorImplEx.class, "frontRight"), DriveTrain.MotorWithLocation.Location.FRONT_RIGHT);
 
-        backLeft.initPID((int) gearRatio * 28, 6000);
-        backRight.initPID((int) gearRatio * 28, 6000);
-        frontLeft.initPID((int) gearRatio * 28, 6000);
-        frontRight.initPID((int) gearRatio * 28, 6000);
+        backLeft.initPID(gearRatio * 28, 6000);
+        backRight.initPID(gearRatio * 28, 6000);
+        frontLeft.initPID(gearRatio * 28, 6000);
+        frontRight.initPID(gearRatio * 28, 6000);
 
 //        frontLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
 //        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
-//        backRight.setDirection(DcMotorImplEx.Direction.REVERSE);
+//        backLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
+        backRight.setDirection(DcMotorImplEx.Direction.REVERSE);
 
         for(DriveTrain.MotorWithLocation motor : new DriveTrain.MotorWithLocation[]{backLeft, backRight, frontLeft, frontRight}) {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         }
 
-        driveTrain = new DriveTrain(DriveTrain.Type.MECANUM, new DriveTrain.MotorWithLocation[]{backLeft, backRight, frontLeft, frontRight}, wheelDiameter, gearRatio);
+        driveTrain = new DriveTrain(DriveTrain.Type.MECANUM, new DriveTrain.MotorWithLocation[]{backLeft, backRight, frontLeft, frontRight}, wheelDiameter, ticksPerRev, gearRatio);
 
         extension = new Motor(hardwareMap.get(DcMotorImplEx.class, "extension"));
         rotatingBase = new Motor(hardwareMap.get(DcMotorImplEx.class, "rotatingBase"));

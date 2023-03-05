@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 public class Enums {
     public enum RobotType {
-        H_DRIVE2,
-        H_DRIVE;
+        REVVED_DOWN,
+        REVVED_UP;
     }
 
     public enum Alliance {

@@ -5,6 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.Enums;
 import org.firstinspires.ftc.teamcode.Flags;
 
-@Flags(robotType = Enums.RobotType.H_DRIVE, alliance = Enums.Alliance.BLUE, side = Enums.Side.RIGHT)
+@Flags(robotType = Enums.RobotType.REVVED_UP, alliance = Enums.Alliance.BLUE, side = Enums.Side.RIGHT)
 @Autonomous(name="Right", group="FTC22_Autonomous")
 public class Right extends AutonomousOpMode {}

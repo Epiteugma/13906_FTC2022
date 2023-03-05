@@ -1,5 +1,7 @@
 package com.z3db0y.flagship;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -83,7 +85,9 @@ public class MotorGroup {
     public void runToPosition(int position, double power, boolean relative) {
         for(Motor motor : motors) motor.runToPositionAsync(position, power, relative);
         for (Motor motor : motors) {
-            while(!motor.atTargetPosition()) {}
+            while(motor.isBusy()) {
+                Log.i("Runnning to", position + " " + motor.getCurrentPosition());
+            }
         }
     }
 
@@ -109,5 +113,9 @@ public class MotorGroup {
             c++;
         }
         return st/c;
+    }
+
+    public void resetEncoders() {
+        for(Motor motor : motors) motor.resetEncoder();
     }
 }

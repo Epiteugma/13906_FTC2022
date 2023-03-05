@@ -74,12 +74,12 @@ public class DriveTrain {
         }
     }
 
-    public DriveTrain(@NonNull Type type, @NonNull MotorWithLocation[] motors, double wheelDiameter, double gearRatio) {
+    public DriveTrain(@NonNull Type type, @NonNull MotorWithLocation[] motors, double wheelDiameter, int ticksPerRevolution, int gearRatio) {
         this.type = type;
         this.motors = motors;
         this.wheelDiameter = wheelDiameter;
         this.gearRatio = gearRatio;
-        this.ticksPerRevolution = 28 * gearRatio;
+        this.ticksPerRevolution = ticksPerRevolution * gearRatio;
 
         for (int num : type.validMotorCounts) {
             if (motors.length == num) {

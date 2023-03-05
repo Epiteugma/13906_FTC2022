@@ -16,7 +16,7 @@ public abstract class BigRobotMode extends LinearOpMode {
         this.backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         this.backRight = hardwareMap.get(DcMotor.class, "backRight");
 
-        this.backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        this.backRight.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     abstract public void runOpMode();

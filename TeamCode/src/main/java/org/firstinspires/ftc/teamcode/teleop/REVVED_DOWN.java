@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Enums;
 import org.firstinspires.ftc.teamcode.Flags;
 
-@TeleOp(name="HDrive2", group="FTC22")
-@Flags(robotType = Enums.RobotType.H_DRIVE2)
+@TeleOp(name="Revved Down", group="FTC22")
+@Flags(robotType = Enums.RobotType.REVVED_DOWN)
 @Disabled
-public class HDrive2 extends TeleOpMode {}
+public class REVVED_DOWN extends TeleOpMode {}

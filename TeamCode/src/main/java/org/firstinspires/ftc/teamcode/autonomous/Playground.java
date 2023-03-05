@@ -6,7 +6,7 @@ import com.z3db0y.flagship.DriveTrain;
 import org.firstinspires.ftc.teamcode.Enums;
 import org.firstinspires.ftc.teamcode.Flags;
 
-@Flags(robotType = Enums.RobotType.H_DRIVE, alliance = Enums.Alliance.BLUE, side = Enums.Side.RIGHT)
+@Flags(robotType = Enums.RobotType.REVVED_UP, alliance = Enums.Alliance.BLUE, side = Enums.Side.RIGHT)
 @Autonomous(name = "Playground", group = "FTC22_Autonomous")
 public class Playground extends AutonomousOpMode {
 
