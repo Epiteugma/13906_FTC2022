@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.pidtest;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(name = "NoPIDForward", group = "PID_TEST")
+@Disabled
 public class NoPIDForward extends MiniRobotMode {
 
     @Override

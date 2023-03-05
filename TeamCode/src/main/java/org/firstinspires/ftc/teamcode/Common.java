@@ -35,7 +35,7 @@ public class Common extends LinearOpMode {
     @Override public void runOpMode() {}
 
     public void initHDrive2() {
-        config = new REVVED_DOWN_Config();
+        config = new REVVED_UP_JR_Config();
 
         int gearRatio = config.getDrivetrain().gearRatio;
         int ticksPerRev = config.getDrivetrain().ticksPerRev;

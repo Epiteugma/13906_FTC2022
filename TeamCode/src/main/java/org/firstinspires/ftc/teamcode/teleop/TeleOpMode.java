@@ -13,7 +13,7 @@ public class TeleOpMode extends Common {
     @Override
     public void runOpMode() {
         if (flags != null) {
-            if (flags.robotType() == Enums.RobotType.REVVED_DOWN) this.initHDrive2();
+            if (flags.robotType() == Enums.RobotType.REVVED_UP_JR) this.initHDrive2();
             else if (flags.robotType() == Enums.RobotType.REVVED_UP) this.initHDrive();
 
             this.initCommon();

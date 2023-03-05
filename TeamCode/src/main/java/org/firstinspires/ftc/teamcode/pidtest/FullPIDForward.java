@@ -4,12 +4,14 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.z3db0y.flagship.pid.AngularPIDController;
 import com.z3db0y.flagship.pid.VelocityPIDController;
 
 @Config
 @TeleOp(name = "FullPIDForward", group = "PID_TEST")
+@Disabled
 public class FullPIDForward extends BigRobotMode {
 
     public static double angular_kP = 1;
