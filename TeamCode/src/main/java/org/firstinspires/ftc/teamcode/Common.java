@@ -32,6 +32,10 @@ public class Common extends LinearOpMode {
     public CommonConfig.ServoConfig leftServoConfig;
     public CommonConfig.ServoConfig rightServoConfig;
 
+    public interface CheckCallback {
+        boolean run();
+    }
+
     @Override public void runOpMode() {}
 
     public void initHDrive2() {

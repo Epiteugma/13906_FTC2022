@@ -12,6 +12,7 @@ import com.z3db0y.flagship.pid.PIDCoeffs;
 import com.z3db0y.flagship.pid.VelocityPIDController;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Common;
 
 public class Motor extends DcMotorImplEx {
 	VelocityPIDController velocityPidController = new VelocityPIDController();
@@ -160,19 +161,19 @@ public class Motor extends DcMotorImplEx {
 		return this.targetPosition;
 	}
 
-	public void runToPosition(int ticks, double power, boolean relative) {
+	public void runToPosition(int ticks, double power, boolean relative, Common.CheckCallback stopRequestedCheck) {
 		if(relative) this.resetEncoder();
 		this.setTargetPosition(ticks);
 		this.setMode(RunMode.RUN_TO_POSITION);
 		this.setPower(power);
-		while (!this.atTargetPosition()){
+		while (!this.atTargetPosition() && !stopRequestedCheck.run()){
 			Log.i("motor is at: ", this.getCurrentPosition() + "should be at: " + this.getTargetPosition());
 		}
 		this.setPower(0);
 	}
 
-	public void runToPosition(int ticks, double power) {
-		this.runToPosition(ticks, power, true);
+	public void runToPosition(int ticks, double power, Common.CheckCallback stopRequestedCheck) {
+		this.runToPosition(ticks, power, true, stopRequestedCheck);
 	}
 
 	public void runToPositionAsync(int ticks, double power, boolean relative) {

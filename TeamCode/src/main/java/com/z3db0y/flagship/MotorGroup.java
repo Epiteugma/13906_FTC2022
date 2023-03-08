@@ -5,6 +5,7 @@ import android.util.Log;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Common;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,10 +83,10 @@ public class MotorGroup {
         }
     }
 
-    public void runToPosition(int position, double power, boolean relative) {
+    public void runToPosition(int position, double power, boolean relative, Common.CheckCallback stopRequestedCheck) {
         for(Motor motor : motors) motor.runToPositionAsync(position, power, relative);
         for (Motor motor : motors) {
-            while(!motor.atTargetPosition()){
+            while(!motor.atTargetPosition() && !stopRequestedCheck.run()){
                 Log.i("Runnning to", position + " " + motor.getCurrentPosition());
             }
         }
@@ -95,8 +96,8 @@ public class MotorGroup {
         for(Motor motor: motors)motor.setTargetPositionTolerance(targetPositionTolerance);
     }
 
-    public void runToPosition(int position, double power) {
-        this.runToPosition(position, power, true);
+    public void runToPosition(int position, double power, Common.CheckCallback stopRequestedCheck) {
+        this.runToPosition(position, power, true, stopRequestedCheck);
     }
 
     public void runToPositionAsync(int position, double power, boolean relative) {
