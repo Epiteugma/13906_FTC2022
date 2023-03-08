@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.acmerobotics.dashboard:dashboard:0.4.6'
+    implementation 'com.acmerobotics.dashboard:dashboard:0.4.8'
     implementation 'org.firstinspires.ftc:Inspection:8.1.1'
     implementation 'org.firstinspires.ftc:Blocks:8.1.1'
     implementation 'org.firstinspires.ftc:Tfod:8.1.1'
