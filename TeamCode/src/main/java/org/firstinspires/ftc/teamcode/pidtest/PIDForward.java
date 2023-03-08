@@ -3,11 +3,13 @@ package org.firstinspires.ftc.teamcode.pidtest;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.z3db0y.flagship.pid.VelocityPIDController;
 
 @Config
 @TeleOp(name = "PIDForward", group = "PID_TEST")
+@Disabled
 public class PIDForward extends MiniRobotMode {
     public static double kP = 1;
     public static double kI = 0;

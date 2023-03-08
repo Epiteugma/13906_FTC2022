@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 public class Enums {
     public enum RobotType {
-        REVVED_DOWN,
+        REVVED_UP_JR,
         REVVED_UP;
     }
 

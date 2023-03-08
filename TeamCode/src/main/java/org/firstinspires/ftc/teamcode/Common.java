@@ -29,10 +29,13 @@ public class Common extends LinearOpMode {
     public Servo rotatingBaseServo;
     public CommonConfig config;
 
+    public CommonConfig.ServoConfig leftServoConfig;
+    public CommonConfig.ServoConfig rightServoConfig;
+
     @Override public void runOpMode() {}
 
     public void initHDrive2() {
-        config = new REVVED_DOWN_Config();
+        config = new REVVED_UP_JR_Config();
 
         int gearRatio = config.getDrivetrain().gearRatio;
         int ticksPerRev = config.getDrivetrain().ticksPerRev;
@@ -48,9 +51,8 @@ public class Common extends LinearOpMode {
         frontLeft.initPID(gearRatio * 28, 6000);
         frontRight.initPID(gearRatio * 28, 6000);
 
-        backLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
-        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-//        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorImplEx.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         driveTrain = new DriveTrain(DriveTrain.Type.MECANUM, new DriveTrain.MotorWithLocation[]{frontLeft, backRight, frontRight, backLeft}, wheelDiameter, ticksPerRev, gearRatio);
 
@@ -76,8 +78,8 @@ public class Common extends LinearOpMode {
     }
 
     public void openClaw(boolean async){
-        leftClaw.setPosition(0.65);
-        rightClaw.setPosition(0.65);
+        leftClaw.setPosition(config.getLeftClawConfig().openPosition);
+        rightClaw.setPosition(config.getRightClawConfig().openPosition);
         if(!async) sleep(1200);
     }
 
@@ -98,8 +100,8 @@ public class Common extends LinearOpMode {
 //    }
 
     public void closeClaw(boolean async){
-        leftClaw.setPosition(0.94);
-        rightClaw.setPosition(0.94);
+        leftClaw.setPosition(config.getLeftClawConfig().closedPosition);
+        rightClaw.setPosition(config.getRightClawConfig().closedPosition);
         if(!async) sleep(1200);
     }
 
@@ -119,8 +121,8 @@ public class Common extends LinearOpMode {
     }
 
     public void encloseClaw(){
-        leftClaw.setPosition(0.5);
-        rightClaw.setPosition(0.5);
+        leftClaw.setPosition(config.getLeftClawConfig().openPosition * 0.77);
+        rightClaw.setPosition(config.getRightClawConfig().openPosition * 0.77);
     }
 
     public void initHDrive() {
@@ -141,9 +143,6 @@ public class Common extends LinearOpMode {
         frontLeft.initPID(gearRatio * 28, 6000);
         frontRight.initPID(gearRatio * 28, 6000);
 
-//        frontLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
-//        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-//        backLeft.setDirection(DcMotorImplEx.Direction.REVERSE);
         backRight.setDirection(DcMotorImplEx.Direction.REVERSE);
 
         for(DriveTrain.MotorWithLocation motor : new DriveTrain.MotorWithLocation[]{backLeft, backRight, frontLeft, frontRight}) {
@@ -172,6 +171,7 @@ public class Common extends LinearOpMode {
         extension.setHoldPower(0.4);
         rotatingBase.setHoldPower(0.5);
         slideMotors.setHoldPower(0.8);
+        slideMotors.setTargetPositionTolerance(20);
 //        extension.getMotorType().setTicksPerRev(28 * 5 * 4);
 //        extension.setStallDetect(true);
 //        leftSlide.getMotorType().setTicksPerRev(28 * 20);

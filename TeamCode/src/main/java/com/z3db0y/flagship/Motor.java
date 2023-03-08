@@ -26,6 +26,7 @@ public class Motor extends DcMotorImplEx {
 	int targetPosition = 0;
 	double gearRatio;
 	boolean stallDetect;
+	int targetPositionTolerance = 10;
 	public Motor(DcMotorImplEx motor) {
 		super(motor.getController(), motor.getPortNumber());
 	}
@@ -80,8 +81,7 @@ public class Motor extends DcMotorImplEx {
 		Log.i("lastTicks", String.valueOf(lastTicks));
 		Log.i("currTicks", String.valueOf(this.getCurrentPosition()));
 		Log.i("minTicksChange", String.valueOf(0.0 * (this.power != 0 ? this.power * this.getMotorType().getTicksPerRev() : this.getVelocity())));
-		boolean stalled = false;
-		if(Math.abs(lastTicks - this.getCurrentPosition()) <= Math.abs(0.005 * (this.power != 0 ? this.power * this.getMotorType().getTicksPerRev() : this.getVelocity()))) stalled = true;
+		boolean stalled = Math.abs(lastTicks - this.getCurrentPosition()) <= Math.abs(0.005 * (this.power != 0 ? this.power * this.getMotorType().getTicksPerRev() : this.getVelocity()));
 		lastStallCheck = System.currentTimeMillis();
 		lastTicks = this.getCurrentPosition();
 		lastStallOutput = stalled;
@@ -165,7 +165,9 @@ public class Motor extends DcMotorImplEx {
 		this.setTargetPosition(ticks);
 		this.setMode(RunMode.RUN_TO_POSITION);
 		this.setPower(power);
-		while (this.isBusy()) {}
+		while (!this.atTargetPosition()){
+			Log.i("motor is at: ", this.getCurrentPosition() + "should be at: " + this.getTargetPosition());
+		}
 		this.setPower(0);
 	}
 
@@ -174,6 +176,7 @@ public class Motor extends DcMotorImplEx {
 	}
 
 	public void runToPositionAsync(int ticks, double power, boolean relative) {
+		this.setMode(RunMode.RUN_USING_ENCODER);
 		if(relative) this.resetEncoder();
 		this.setTargetPosition(ticks);
 		this.setMode(RunMode.RUN_TO_POSITION);
@@ -184,8 +187,16 @@ public class Motor extends DcMotorImplEx {
 		this.runToPositionAsync(ticks, power, true);
 	}
 
+	public void setTargetPositionTolerance(int targetPositionTolerance){
+		this.targetPositionTolerance = targetPositionTolerance;
+	}
+
+	public int getTargetPositionTolerance(){
+		return this.targetPositionTolerance;
+	}
+
 	public boolean atTargetPosition(){
-		return Math.abs(this.getCurrentPosition() - this.getTargetPosition()) < 20;
+		return Math.abs(this.getCurrentPosition() - this.getTargetPosition()) < targetPositionTolerance;
 	}
 
 	public void setPIDCoeffs(PIDCoeffs coeffs) {

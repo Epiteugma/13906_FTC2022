@@ -4,11 +4,13 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.z3db0y.flagship.pid.AngularPIDController;
 
 @Config
 @TeleOp(name = "AngularPIDForward", group = "PID_TEST")
+@Disabled
 public class AngularPIDForward extends MiniRobotMode {
 
     public static double kP = 1;

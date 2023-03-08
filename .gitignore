@@ -87,3 +87,9 @@ lint/tmp/
 
 # Node modules
 node_modules/
+
+# IDEA
+.idea/
+
+# Gradle
+.gradle/

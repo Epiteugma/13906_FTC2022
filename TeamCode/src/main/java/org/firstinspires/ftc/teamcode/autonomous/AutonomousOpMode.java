@@ -35,7 +35,7 @@ public class AutonomousOpMode extends Common {
     public void runOpMode() {
         if (flags != null) {
 
-            if (flags.robotType() == Enums.RobotType.REVVED_DOWN) this.initHDrive2();
+            if (flags.robotType() == Enums.RobotType.REVVED_UP_JR) this.initHDrive2();
             else if (flags.robotType() == Enums.RobotType.REVVED_UP) this.initHDrive();
 
             this.initCommon();
@@ -142,26 +142,33 @@ public class AutonomousOpMode extends Common {
         parkingPosition = sleeveDetection(1500);
         detector.stop();
 
-        slideMotors.runToPosition(TickUtils.cmToTicks(10, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1);
-        Log.i("slide", "finished");
+        slideMotors.runToPosition(TickUtils.cmToTicks(7, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1);
         List<PIDTask> pidQueue = new ArrayList<>();
-        pidQueue.add(new PIDTask(PIDTaskType.STRAFE, TickUtils.cmToTicks(-10 * sideMlt, ticksPerRev, wheelRadius), 1));
-        pidQueue.add(new PIDTask(PIDTaskType.TURN, -90 * sideMlt, 1));
-        pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(85, ticksPerRev, wheelRadius), 1));
-        pidQueue.add(new PIDTask(PIDTaskType.TURN, -45 * sideMlt, 0.3, () -> {
-            slideMotors.runToPosition(TickUtils.cmToTicks(102.5, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1);
-            extension.runToPosition(TickUtils.cmToTicks(35, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM/2), 1);
-            slideMotors.runToPosition(TickUtils.cmToTicks(-90, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1);
-            openClaw();
+        pidQueue.add(new PIDTask(PIDTaskType.STRAFE, TickUtils.cmToTicks(-15, ticksPerRev, wheelRadius), 1));
+        pidQueue.add(new PIDTask(PIDTaskType.TURN, -63 * sideMlt, 1, () -> {
+            extension.runToPosition(TickUtils.cmToTicks(30, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM / 2), 0.7);
         }));
-        pidQueue.add(new PIDTask(PIDTaskType.TURN, -180, 1));
-        pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(23, ticksPerRev, wheelRadius), 0.4, () -> {
+        pidQueue.add(new PIDTask(PIDTaskType.TURN, -130 * sideMlt, 1, () -> {
+            extension.runToPosition(TickUtils.cmToTicks(-30, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM/2), 0.7);
+        }));
+        pidQueue.add(new PIDTask(PIDTaskType.TURN, -90 * sideMlt, 0.4));
+        pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(73, ticksPerRev, wheelRadius), 1));
+        pidQueue.add(new PIDTask(PIDTaskType.TURN, -45 * sideMlt, 0.45, () -> {
+            slideMotors.runToPosition(TickUtils.cmToTicks(105, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 0.7);
+            extension.runToPosition(TickUtils.cmToTicks(30, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM/2), 0.7);
+            slideMotors.runToPosition(TickUtils.cmToTicks(-90, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 0.7);
+            openClaw();
+            extension.runToPosition(TickUtils.cmToTicks(-30, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM/2), 0.7);
+        }));
+        pidQueue.add(new PIDTask(PIDTaskType.TURN, -180, 0.7));
+        pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(40, ticksPerRev, wheelRadius), 0.7, () -> {
             closeClaw();
             slideMotors.runToPosition(TickUtils.cmToTicks(24, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1);
         }));
+        pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(-10, ticksPerRev, wheelRadius), 1));
         pidQueue.add(new PIDTask(PIDTaskType.TURN, -90 * sideMlt, 0.4, () -> {
-            extension.runToPosition(TickUtils.cmToTicks(-25, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM/2), 1);
-            slideMotors.runToPosition(TickUtils.cmToTicks(-18, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1);
+//            extension.runToPosition(TickUtils.cmToTicks(-35, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM/2), 1);
+            slideMotors.runToPosition(TickUtils.cmToTicks(-45, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1);
             openClaw();
         }));
         switch(parkingPosition){
@@ -213,7 +220,7 @@ public class AutonomousOpMode extends Common {
             frontRight.resetEncoder();
 
             // Task loop
-            while (!currentTask.complete && opModeIsActive()) {
+            while (!currentTask.complete && !isStopRequested()) {
                 double angularOutput = angularPID.getOutput(targetAngle, 1);
 
                 boolean frontLeftAtTarget = Math.abs(frontLeft.getCurrentPosition()) >= Math.abs(currentTask.target);
@@ -285,6 +292,7 @@ public class AutonomousOpMode extends Common {
                 }
                 telemetry.update();
             }
+            if (isStopRequested()) break;
             // Post-task
             if(currentTask.onComplete != null) currentTask.onComplete.run();
         }

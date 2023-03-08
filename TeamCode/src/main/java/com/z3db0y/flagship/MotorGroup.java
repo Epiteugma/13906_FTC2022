@@ -85,10 +85,14 @@ public class MotorGroup {
     public void runToPosition(int position, double power, boolean relative) {
         for(Motor motor : motors) motor.runToPositionAsync(position, power, relative);
         for (Motor motor : motors) {
-            while(motor.isBusy()) {
+            while(!motor.atTargetPosition()){
                 Log.i("Runnning to", position + " " + motor.getCurrentPosition());
             }
         }
+    }
+
+    public void setTargetPositionTolerance(int targetPositionTolerance){
+        for(Motor motor: motors)motor.setTargetPositionTolerance(targetPositionTolerance);
     }
 
     public void runToPosition(int position, double power) {

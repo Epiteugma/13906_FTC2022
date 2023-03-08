@@ -3,6 +3,15 @@ package org.firstinspires.ftc.teamcode;
 import com.z3db0y.flagship.pid.PIDCoeffs;
 
 public class CommonConfig {
+    public static class ServoConfig {
+        public double openPosition;
+        public double closedPosition;
+
+        public ServoConfig(double openPosition, double closedPosition) {
+            this.openPosition = openPosition;
+            this.closedPosition = closedPosition;
+        }
+    }
     public static class DriveTrain {
         public int gearRatio = 1;
         public int ticksPerRev = 28;
@@ -88,4 +97,11 @@ public class CommonConfig {
         return null;
     }
 
+    public ServoConfig getLeftClawConfig() {
+        return null;
+    }
+
+    public ServoConfig getRightClawConfig() {
+        return null;
+    }
 }
