@@ -19,11 +19,12 @@ public class MotorTester extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         frontLeft = new Motor(hardwareMap.get(DcMotorImplEx.class, "frontLeft"));
         frontRight = new Motor(hardwareMap.get(DcMotorImplEx.class, "frontRight"));
         backLeft = new Motor(hardwareMap.get(DcMotorImplEx.class, "backLeft"));
         backRight = new Motor(hardwareMap.get(DcMotorImplEx.class, "backRight"));
-        Logger.setTelemetry(new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()));
+        Logger.setTelemetry(telemetry);
         waitForStart();
         while (opModeIsActive()) {
             frontRight.setPower(0);

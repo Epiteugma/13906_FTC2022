@@ -27,7 +27,7 @@ public class Motor extends DcMotorImplEx {
 	int targetPosition = 0;
 	double gearRatio;
 	boolean stallDetect;
-	int targetPositionTolerance = 10;
+	int targetPositionTolerance = 4;
 	public Motor(DcMotorImplEx motor) {
 		super(motor.getController(), motor.getPortNumber());
 	}

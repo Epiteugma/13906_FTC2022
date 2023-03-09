@@ -89,8 +89,12 @@ public class VelocityPIDController {
             this.telem.addData(this.TAG + "/out", out);
         }
 
+        int mlt = out < 0 ? 1 : -1;
+
+//        return out + 0.1 * mlt;
         return out;
     }
+
 
     public void run(double power) {
         this.motor.setPower(this.getOutput(power));

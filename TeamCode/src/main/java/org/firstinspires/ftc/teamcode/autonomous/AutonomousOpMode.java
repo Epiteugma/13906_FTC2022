@@ -126,6 +126,24 @@ public class AutonomousOpMode extends Common {
         backRight.setPower(0);
         frontLeft.setPower(0);
         frontRight.setPower(0);
+        backLeft.setPIDCoeffs(2.2, 0,0);
+        backRight.setPIDCoeffs(2.2, 0,0);
+        frontLeft.setPIDCoeffs(2.2, 0,0);
+        frontRight.setPIDCoeffs(2.2, 0,0);
+    }
+
+    void enablePID(){
+        frontLeft.enablePID();
+        frontRight.enablePID();
+        backLeft.enablePID();
+        backRight.enablePID();
+    }
+
+    void disablePID(){
+        frontLeft.disablePID();
+        frontRight.disablePID();
+        backLeft.disablePID();
+        backRight.disablePID();
     }
 
     public void run() {
@@ -144,49 +162,65 @@ public class AutonomousOpMode extends Common {
 
         CheckCallback stopRequestedCheck = this::isStopRequested;
 
-        slideMotors.runToPosition(TickUtils.cmToTicks(7, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1, stopRequestedCheck);
+        slideMotors.runToPosition(TickUtils.cmToTicks(10, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1, stopRequestedCheck);
         List<PIDTask> pidQueue = new ArrayList<>();
-        pidQueue.add(new PIDTask(PIDTaskType.STRAFE, TickUtils.cmToTicks(-15, ticksPerRev, wheelRadius), 1));
-        pidQueue.add(new PIDTask(PIDTaskType.TURN, -63 * sideMlt, 1, () -> {
-            extension.runToPosition(TickUtils.cmToTicks(30, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM / 2), 0.7, stopRequestedCheck);
-        }));
-        pidQueue.add(new PIDTask(PIDTaskType.TURN, -130 * sideMlt, 1, () -> {
-            extension.runToPosition(TickUtils.cmToTicks(-30, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM/2), 0.7, stopRequestedCheck);
-        }));
-        pidQueue.add(new PIDTask(PIDTaskType.TURN, -90 * sideMlt, 0.4));
-        pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(73, ticksPerRev, wheelRadius), 1));
-        pidQueue.add(new PIDTask(PIDTaskType.TURN, -45 * sideMlt, 0.45, () -> {
+        pidQueue.add(new PIDTask(PIDTaskType.STRAFE, TickUtils.cmToTicks(11, ticksPerRev, wheelRadius), 0.8));
+        pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(-24, ticksPerRev, wheelRadius), 0.8));
+        pidQueue.add(new PIDTask(PIDTaskType.TURN, 90 * sideMlt, 0.6));
+        pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(107.5, ticksPerRev, wheelRadius), 1, () -> {
             slideMotors.runToPosition(TickUtils.cmToTicks(105, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 0.7, stopRequestedCheck);
-            extension.runToPosition(TickUtils.cmToTicks(30, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM/2), 0.7, stopRequestedCheck);
-            slideMotors.runToPosition(TickUtils.cmToTicks(-90, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 0.7, stopRequestedCheck);
-            openClaw();
-            extension.runToPosition(TickUtils.cmToTicks(-30, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM/2), 0.7, stopRequestedCheck);
         }));
-        pidQueue.add(new PIDTask(PIDTaskType.TURN, -180, 0.7));
-        pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(40, ticksPerRev, wheelRadius), 0.7, () -> {
+        pidQueue.add(new PIDTask(PIDTaskType.TURN, 0, 0.4));
+        pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(3, ticksPerRev, wheelRadius), 1, () -> {
+            openClaw();
+        }));
+        pidQueue.add(new PIDTask(PIDTaskType.STRAFE, TickUtils.cmToTicks(-23, ticksPerRev, wheelRadius), 0.5, ()->{
+            slideMotors.runToPosition(TickUtils.cmToTicks(-85, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1, stopRequestedCheck);
+        }));
+        pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(3, ticksPerRev, wheelRadius), 1, () -> {
             closeClaw();
-            slideMotors.runToPosition(TickUtils.cmToTicks(24, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1, stopRequestedCheck);
+            slideMotors.runToPosition(TickUtils.cmToTicks(20, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1, stopRequestedCheck);
         }));
-        pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(-10, ticksPerRev, wheelRadius), 1));
-        pidQueue.add(new PIDTask(PIDTaskType.TURN, -90 * sideMlt, 0.4, () -> {
-//            extension.runToPosition(TickUtils.cmToTicks(-35, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM/2), 1);
-            slideMotors.runToPosition(TickUtils.cmToTicks(-45, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1, stopRequestedCheck);
-            openClaw();
-        }));
-        switch(parkingPosition){
-            case LEFT:
-                pidQueue.add(new PIDTask(PIDTaskType.TURN, 0, 0.4));
-                pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(40, ticksPerRev, wheelRadius), 0.55));
-                break;
-            case CENTER:
-                pidQueue.add(new PIDTask(PIDTaskType.TURN, 0, 0.4));
-                pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(15, ticksPerRev, wheelRadius), 0.55));
-                break;
-            case RIGHT:
-                pidQueue.add(new PIDTask(PIDTaskType.TURN, 0, 0.4));
-                pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(-15, ticksPerRev, wheelRadius), 0.55));
-                break;
-        }
+//        pidQueue.add(new PIDTask(PIDTaskType.TURN, -63 * sideMlt, 1, () -> {
+//            extension.runToPosition(TickUtils.cmToTicks(30, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM / 2), 0.7, stopRequestedCheck);
+//        }));
+//        pidQueue.add(new PIDTask(PIDTaskType.TURN, -130 * sideMlt, 1, () -> {
+//            extension.runToPosition(TickUtils.cmToTicks(-30, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM/2), 0.7, stopRequestedCheck);
+//        }));
+//        pidQueue.add(new PIDTask(PIDTaskType.TURN, -90 * sideMlt, 0.4));
+//        pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(75, ticksPerRev, wheelRadius), 1));
+//        pidQueue.add(new PIDTask(PIDTaskType.TURN, -45 * sideMlt, 0.45, () -> {
+//            slideMotors.runToPosition(TickUtils.cmToTicks(105, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 0.7, stopRequestedCheck);
+//            extension.runToPosition(TickUtils.cmToTicks(30, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM/2), 0.7, stopRequestedCheck);
+//            slideMotors.runToPosition(TickUtils.cmToTicks(-95, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 0.7, stopRequestedCheck);
+//            openClaw();
+//            extension.runToPosition(TickUtils.cmToTicks(-30, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM/2), 0.7, stopRequestedCheck);
+//        }));
+//        pidQueue.add(new PIDTask(PIDTaskType.TURN, -180, 0.7));
+//        pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(40, ticksPerRev, wheelRadius), 0.7, () -> {
+//            closeClaw();
+//            slideMotors.runToPosition(TickUtils.cmToTicks(24, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1, stopRequestedCheck);
+//        }));
+//        pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(-5, ticksPerRev, wheelRadius), 1));
+//        pidQueue.add(new PIDTask(PIDTaskType.TURN, -90 * sideMlt, 0.4, () -> {
+////            extension.runToPosition(TickUtils.cmToTicks(-35, extensionConfig.ticksPerRev * extensionConfig.gearRatio, extensionConfig.wheelDiameterCM/2), 1);
+//            slideMotors.runToPosition(TickUtils.cmToTicks(-45, slideConfig.ticksPerRev * slideConfig.gearRatio, slideConfig.wheelDiameterCM/2), 1, stopRequestedCheck);
+//            openClaw();
+//        }));
+//        switch(parkingPosition){
+//            case LEFT:
+//                pidQueue.add(new PIDTask(PIDTaskType.TURN, 0, 0.4));
+//                pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(40, ticksPerRev, wheelRadius), 0.55));
+//                break;
+//            case CENTER:
+//                pidQueue.add(new PIDTask(PIDTaskType.TURN, 0, 0.4));
+//                pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(15, ticksPerRev, wheelRadius), 0.55));
+//                break;
+//            case RIGHT:
+//                pidQueue.add(new PIDTask(PIDTaskType.TURN, 0, 0.4));
+//                pidQueue.add(new PIDTask(PIDTaskType.DRIVE, TickUtils.cmToTicks(-15, ticksPerRev, wheelRadius), 0.55));
+//                break;
+//        }
 
         VelocityPIDController pidVeloBackLeft = new VelocityPIDController(config.getBackLeftVeloPID()).bind(backLeft, ticksPerRev, maxRPM);
         VelocityPIDController pidVeloBackRight = new VelocityPIDController(config.getBackRightVeloPID()).bind(backRight, ticksPerRev, maxRPM);
@@ -226,10 +260,16 @@ public class AutonomousOpMode extends Common {
                 Log.i("Stoprequested", "false");
                 double angularOutput = angularPID.getOutput(targetAngle, 1);
 
-                boolean frontLeftAtTarget = Math.abs(frontLeft.getCurrentPosition()) >= Math.abs(currentTask.target);
-                boolean frontRightAtTarget = Math.abs(frontRight.getCurrentPosition()) >= Math.abs(currentTask.target);
-                boolean backLeftAtTarget = Math.abs(backLeft.getCurrentPosition()) >= Math.abs(currentTask.target);
-                boolean backRightAtTarget = Math.abs(backRight.getCurrentPosition()) >= Math.abs(currentTask.target);
+                boolean frontLeftAtTarget = Math.abs(Math.abs(frontLeft.getCurrentPosition()) - Math.abs(currentTask.target)) < frontLeft.getTargetPositionTolerance();
+                boolean frontRightAtTarget = Math.abs(Math.abs(frontRight.getCurrentPosition()) - Math.abs(currentTask.target)) < frontRight.getTargetPositionTolerance();
+                boolean backLeftAtTarget = Math.abs(Math.abs(backLeft.getCurrentPosition()) - Math.abs(currentTask.target)) < backLeft.getTargetPositionTolerance();
+                boolean backRightAtTarget = Math.abs(Math.abs(backRight.getCurrentPosition()) - Math.abs(currentTask.target)) < backRight.getTargetPositionTolerance();
+
+                telemetry.addData("frontLeft: ", frontLeftAtTarget + " " + frontLeft.getCurrentPosition() + " " + currentTask.target);
+                telemetry.addData("frontRight: ", frontRightAtTarget + " " + frontRight.getCurrentPosition() + " " + currentTask.target);
+                telemetry.addData("backLeft: ", backLeftAtTarget + " " + backLeft.getCurrentPosition() + " " + currentTask.target);
+                telemetry.addData("backRight: ", backRightAtTarget + " " + backRight.getCurrentPosition() + " " + currentTask.target);
+                telemetry.update();
 
                 switch (currentTask.type) {
                     case DRIVE:
@@ -238,13 +278,10 @@ public class AutonomousOpMode extends Common {
                         Log.i("backLeft: ", "current: " + backLeft.getCurrentPosition() + " target: " + currentTask.target);
                         Log.i("backRight: ", "current: " + backRight.getCurrentPosition() + " target: " + currentTask.target);
                         if(backLeftAtTarget && backRightAtTarget && frontLeftAtTarget && frontRightAtTarget) {
-                            if(i + 1 == pidQueue.size()) halt();
-                            else {
-                                frontLeft.setPower(pidVeloFrontLeft.getOutput(-angularOutput));
-                                frontRight.setPower(pidVeloFrontRight.getOutput(angularOutput));
-                                backLeft.setPower(pidVeloBackLeft.getOutput(-angularOutput));
-                                backRight.setPower(pidVeloBackRight.getOutput(angularOutput));
-                            }
+                            frontLeft.setPower(pidVeloFrontLeft.getOutput(-angularOutput));
+                            frontRight.setPower(pidVeloFrontRight.getOutput(angularOutput));
+                            backLeft.setPower(pidVeloBackLeft.getOutput(-angularOutput));
+                            backRight.setPower(pidVeloBackRight.getOutput(angularOutput));
                             currentTask.complete = true;
                         }
                         else {
@@ -253,16 +290,20 @@ public class AutonomousOpMode extends Common {
 //                            frontRight.setPower(pidFrontRight.getOutput((currentTask.power + angularOutput) * mlt));
 //                            backLeft.setPower(pidVeloBackLeft.getOutput((currentTask.power - angularOutput) * mlt));
 //                            backRight.setPower(pidVeloBackRight.getOutput((currentTask.power + angularOutput) * mlt));
-                            frontLeft.setPower(pidVeloFrontLeft.getOutput(Math.max(pidTickFrontLeft.getOutput(currentTask.target) * currentTask.power - angularOutput, 0.15) * mlt));
-                            frontRight.setPower(pidVeloFrontRight.getOutput(Math.max(pidTickFrontRight.getOutput(currentTask.target) * currentTask.power + angularOutput, 0.15) * mlt));
-                            backLeft.setPower(pidVeloBackLeft.getOutput(Math.max(pidTickBackLeft.getOutput(currentTask.target) * currentTask.power - angularOutput, 0.15) * mlt));
-                            backRight.setPower(pidVeloBackRight.getOutput(Math.max(pidTickBackRight.getOutput(currentTask.target) * currentTask.power + angularOutput, 0.15) * mlt));
+                            frontLeft.setPower(pidVeloFrontLeft.getOutput(pidTickFrontLeft.getOutput(currentTask.target) * currentTask.power - angularOutput) * mlt);
+                            frontRight.setPower(pidVeloFrontRight.getOutput(pidTickFrontRight.getOutput(currentTask.target) * currentTask.power + angularOutput) * mlt);
+                            backLeft.setPower(pidVeloBackLeft.getOutput(pidTickBackLeft.getOutput(currentTask.target) * currentTask.power - angularOutput) * mlt);
+                            backRight.setPower(pidVeloBackRight.getOutput(pidTickBackRight.getOutput(currentTask.target) * currentTask.power + angularOutput) * mlt);
                         }
                         break;
                     case TURN:
+                        backRight.setPIDCoeffs(1,0,0);
+                        backLeft.setPIDCoeffs(1,0,0);
+                        frontLeft.setPIDCoeffs(1,0,0);
+                        frontRight.setPIDCoeffs(1,0,0);
                         double angle = imu.getAngularOrientation().firstAngle;
                         targetAngle = currentTask.target;
-                        if(Math.abs(Math.abs(currentTask.target) - Math.abs(angle)) < 1) {
+                        if(Math.abs(Math.abs(currentTask.target) - Math.abs(angle)) < 3) {
                             halt();
                             currentTask.complete = true;
                         }
@@ -286,10 +327,10 @@ public class AutonomousOpMode extends Common {
                         }
                         else {
                             int mlt = currentTask.target < 0 ? -1 : 1;
-                            frontLeft.setPower(pidVeloFrontLeft.getOutput(Math.max(pidTickFrontLeft.getOutput(-currentTask.target) * currentTask.power + angularOutput, 0.25) * -mlt));
-                            frontRight.setPower(pidVeloFrontRight.getOutput(Math.max(pidTickFrontRight.getOutput(currentTask.target) * currentTask.power - angularOutput, 0.25) * mlt));
-                            backLeft.setPower(pidVeloBackLeft.getOutput(Math.max(pidTickBackLeft.getOutput(currentTask.target) * currentTask.power + angularOutput, 0.25) * mlt));
-                            backRight.setPower(pidVeloBackRight.getOutput(Math.max(pidTickBackRight.getOutput(-currentTask.target) * currentTask.power - angularOutput, 0.25) * -mlt));
+                            frontLeft.setPower(-pidVeloFrontLeft.getOutput(pidTickFrontLeft.getOutput(-currentTask.target) * currentTask.power + angularOutput * mlt));
+                            frontRight.setPower(pidVeloFrontRight.getOutput(pidTickFrontRight.getOutput(currentTask.target) * currentTask.power - angularOutput * mlt));
+                            backLeft.setPower(pidVeloBackLeft.getOutput(pidTickBackLeft.getOutput(currentTask.target) * currentTask.power + angularOutput * mlt));
+                            backRight.setPower(-pidVeloBackRight.getOutput(pidTickBackRight.getOutput(-currentTask.target) * currentTask.power - angularOutput * mlt));
                         }
                         break;
                 }
@@ -297,8 +338,14 @@ public class AutonomousOpMode extends Common {
             }
             if (isStopRequested()) break;
             // Post-task
-            if(currentTask.onComplete != null) currentTask.onComplete.run();
+            if(currentTask.onComplete != null) {
+                halt();
+                currentTask.onComplete.run();
+            }
         }
+        halt();
+        telemetry.addData("Autnomous: ", "finished!!!");
+        telemetry.update();
         // After queue
 //        while (opModeIsActive()) {
 //            telemetry.addData("exited", "---");
