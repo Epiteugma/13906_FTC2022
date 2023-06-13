@@ -1,1 +1,1 @@
-FTC PowerPlay season 2022-2023 Team Epiteugma Revved Up
+Team Epiteugma Revved Up FTC 2022-2023 PowerPlay, Bucharest, Romania - Nicosia,Cyprus Captain Winning aliance and Design Awards
